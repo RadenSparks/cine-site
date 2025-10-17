@@ -1,51 +1,54 @@
+
+import { useSelector } from "react-redux";
+import { type RootState } from "../store";
 import { CineCard } from './UI/CineCard';
 
 interface Movie {
   id: string;
   title: string;
   poster: string;
-  releaseDate: string;
+  releaseDate?: string;
 }
 
-const comingSoonMovies: Movie[] = [
-  {
-    id: '101',
-    title: 'Avatar: The Way of Water',
-    poster: 'https://image.tmdb.org/t/p/w500/5Avw5m4rGgNfZr0GrMIQZ1mjJw6.jpg',
-    releaseDate: '2025-10-01',
-  },
-  {
-    id: '102',
-    title: 'Mission Impossible: Dead Reckoning',
-    poster: 'https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg',
-    releaseDate: '2025-11-15',
-  },
-  {
-    id: '103',
-    title: 'Inside Out 2',
-    poster: 'https://image.tmdb.org/t/p/w500/6fAqf2j6pQjQH2b7bA5T2yYQ6bA.jpg',
-    releaseDate: '2025-12-20',
-  },
-  {
-    id: '104',
-    title: 'Spider-Man: Beyond the Spider-Verse',
-    poster: 'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg',
-    releaseDate: '2026-01-10',
-  },
-];
-
 export default function ComingSoonSection() {
+  const movies = useSelector((s: RootState) => s.movies.list) as Movie[] | undefined;
+  const now = Date.now();
+
+  const comingSoonFromStore = (Array.isArray(movies) ? movies : []).filter((m) => {
+    if (!m.releaseDate) return false;
+    const t = Date.parse(m.releaseDate);
+    return !Number.isNaN(t) && t > now;
+  }).slice(0, 4);
+
+  // fallback static list (kept minimal)
+  const fallback = [
+    {
+      id: 'cs-1',
+      title: 'Avatar: The Way of Water',
+      poster: "https://xl.movieposterdb.com/23_09/2022/1630029/xl_avatar-the-way-of-water-movie-poster_614883c4.jpg?v=2025-07-11%2013:53:24",
+      releaseDate: '2025-10-01',
+    },
+    {
+      id: 'cs-2',
+      title: 'Mission Impossible: Dead Reckoning',
+      poster: 'https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg',
+      releaseDate: '2025-11-15',
+    },
+  ];
+
+  const list = comingSoonFromStore.length ? comingSoonFromStore : fallback;
+
   return (
     <div className="mb-12">
       <h2 className="text-xl font-bold mb-4 text-white">Coming Soon</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {comingSoonMovies.map(movie => (
+        {list.map(movie => (
           <CineCard
             key={movie.id}
             id={movie.id}
             title={movie.title}
             poster={movie.poster}
-            releaseDate={movie.releaseDate}
+            releaseDate={movie.releaseDate ?? ""}
             showBookButton={false}
             disabled={true}
           />

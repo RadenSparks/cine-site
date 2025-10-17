@@ -5,7 +5,7 @@ import { FilmIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { Button, Avatar , Breadcrumbs } from "@heroui/react";
 import { type RootState } from "../../store";
 import { logout } from "../../store/authSlice";
-import { cn } from "../../lib/utils"; // If you have a cn utility, else use classnames
+import { cn } from "../../lib/utils";
 
 export default function AppNavbar({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
@@ -22,21 +22,14 @@ export default function AppNavbar({ className }: { className?: string }) {
   ];
 
   return (
-    <div
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 mx-auto max-w-5xl",
-        className
-      )}
-    >
+    <div className={cn("fixed top-0 left-0 right-0 z-50 mx-auto max-w-5xl", className)}>
       <nav className="relative flex items-center justify-between px-8 py-4 rounded-b-2xl bg-gradient-to-r from-indigo-900 via-indigo-700 to-pink-900 shadow-xl backdrop-blur-lg border-b border-pink-500/30">
         {/* Logo and Brand */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 font-bold text-2xl text-white hover:scale-105 transition-transform"
-        >
+        <Link to="/" className="flex items-center gap-2 font-bold text-2xl text-white hover:scale-105 transition-transform">
           <FilmIcon className="h-8 w-8 text-pink-400 drop-shadow" />
           CineSite
         </Link>
+
         {/* Menu */}
         <div className="flex gap-8 text-lg">
           <MenuItem
@@ -64,31 +57,20 @@ export default function AppNavbar({ className }: { className?: string }) {
             setActive={(value) => setActive(value ?? "Promotions")}
           />
         </div>
+
         {/* User Menu */}
         <div>
           {user ? (
             <div className="flex items-center gap-3">
-              <Avatar
-                name={user.email}
-                icon={<UserCircleIcon className="h-8 w-8" />}
-              />
+              <Avatar name={user.email} icon={<UserCircleIcon className="h-8 w-8" />} />
               <span className="text-sm text-white">{user.email}</span>
-              <Button
-                color="danger"
-                size="sm"
-                className="shadow-md"
-                onClick={() => dispatch(logout())}
-              >
+              <Button color="danger" size="sm" className="shadow-md" onClick={() => dispatch(logout())}>
                 Logout
               </Button>
             </div>
           ) : (
-            <Button
-              color="primary"
-              as={Link}
-              to="/login"
-              className="shadow-md"
-            >
+            // point Login button to /auth so it opens the unified auth page
+            <Button color="primary" as={Link} to="/auth" className="shadow-md">
               Login
             </Button>
           )}

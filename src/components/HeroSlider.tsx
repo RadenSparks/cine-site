@@ -1,106 +1,153 @@
-import { useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { Chip, Button } from "@heroui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { Chip } from "@heroui/react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+import { type RootState } from "../store";
+// replace @heroui Button with your CineButton
+import { CineButton } from "./UI/CineButton";
 
 interface Movie {
   id: string;
   title: string;
   poster: string;
-  description: string;
+  description?: string;
+  releaseDate?: string;
 }
 
-export default function HeroSlider({ movies }: { movies: Movie[] }) {
+export default function HeroSlider() {
+  const movies = useSelector((s: RootState) => s.movies.list) as Movie[] | undefined;
+  const slides = (Array.isArray(movies) ? movies : []).slice(0, 4);
   const [active, setActive] = useState(0);
-  const count = movies.length;
+  const [hovered, setHovered] = useState(false);
+  const count = slides.length;
+  const touchStartX = useRef<number | null>(null);
+  const mounted = useRef(true);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!count) return;
+    const interval = setInterval(() => {
+      if (!hovered && mounted.current) {
+        setActive((s) => (s + 1) % count);
+      }
+    }, 5200);
+    return () => clearInterval(interval);
+  }, [count, hovered]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") setActive((s) => (s + 1) % count);
+      if (e.key === "ArrowLeft") setActive((s) => (s - 1 + count) % count);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [count]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches?.[0]?.clientX ?? null;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current == null) return;
+    const endX = e.changedTouches?.[0]?.clientX ?? 0;
+    const dx = endX - touchStartX.current;
+    const threshold = 40;
+    if (dx > threshold) {
+      setActive((s) => (s - 1 + count) % count);
+    } else if (dx < -threshold) {
+      setActive((s) => (s + 1) % count);
+    }
+    touchStartX.current = null;
+  };
+
   if (!count) return null;
 
-  function prev() {
-    setActive((prev) => (prev === 0 ? count - 1 : prev - 1));
-  }
-  function next() {
-    setActive((prev) => (prev === count - 1 ? 0 : prev + 1));
-  }
-
   const slideVariants = {
-    initial: {
-      scale: 0.95,
-      opacity: 0,
-      rotateX: 45,
-    },
+    initial: { scale: 0.98, opacity: 0, y: 16 },
     visible: {
       scale: 1,
-      rotateX: 0,
       opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: ["easeInOut"],
-      },
+      y: 0,
+      transition: { duration: 0.7, ease: [0.215, 0.61, 0.355, 1] },
     },
-    exit: {
-      opacity: 0,
-      y: "-100%",
-      transition: {
-        duration: 0.6,
-      },
-    },
+    exitUp: { opacity: 0, y: -12, transition: { duration: 0.6 } },
+    exitDown: { opacity: 0, y: 12, transition: { duration: 0.6 } },
   };
 
   return (
     <div className="mb-12">
-      <div className="relative w-full h-[40rem] rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center"
-        style={{ perspective: "1000px" }}
+      <div
+        className="relative w-full overflow-hidden rounded-2xl select-none"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        aria-roledescription="carousel"
       >
-        {/* Animated Image Slider */}
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={movies[active].id}
-            src={movies[active].poster}
-            alt={movies[active].title}
-            initial="initial"
-            animate="visible"
-            exit="exit"
-            variants={slideVariants}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-        </AnimatePresence>
-        {/* Cinematic Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-black/90 z-10" />
-        {/* Content Overlay */}
-        <div className="absolute left-8 bottom-16 text-white max-w-xl drop-shadow-lg z-20">
-          <Chip color="primary" className="mb-2">Featured</Chip>
-          <h2 className="text-5xl font-extrabold mb-4">{movies[active].title}</h2>
-          <p className="text-xl mb-6">{movies[active].description}</p>
-          <Button as={Link} to={`/movie/${movies[active].id}`} color="success" size="lg" className="shadow-lg">
-            Book Now
-          </Button>
-        </div>
-        {/* Navigation Arrows */}
-        <button
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-gradient-to-br from-indigo-700 to-pink-600 text-white rounded-full p-2 shadow-lg z-30"
-          onClick={prev}
-          aria-label="Previous"
-        >
-          <ChevronLeftIcon className="h-8 w-8" />
-        </button>
-        <button
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-gradient-to-br from-indigo-700 to-pink-600 text-white rounded-full p-2 shadow-lg z-30"
-          onClick={next}
-          aria-label="Next"
-        >
-          <ChevronRightIcon className="h-8 w-8" />
-        </button>
-        {/* Indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
-          {movies.map((_, idx) => (
-            <button
-              key={idx}
-              className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${active === idx ? 'bg-pink-500 border-white scale-110' : 'bg-white/40 border-pink-500'}`}
-              onClick={() => setActive(idx)}
-              aria-label={`Go to slide ${idx + 1}`}
+        <div className="relative h-[420px] sm:h-[520px] md:h-[620px] lg:h-[720px]">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.img
+              key={slides[active].id}
+              src={slides[active].poster}
+              alt={slides[active].title}
+              initial="initial"
+              animate="visible"
+              exit={hovered ? "exitDown" : "exitUp"}
+              variants={slideVariants}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              draggable={false}
             />
-          ))}
+          </AnimatePresence>
+
+          {/* stronger cinematic overlay for contrast */}
+          <div className="absolute inset-0 z-10 pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/40 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/60 to-transparent" />
+          </div>
+
+          {/* content */}
+          <div className="absolute left-6 sm:left-10 md:left-14 bottom-8 sm:bottom-16 z-20 max-w-xl text-white">
+            <Chip color="primary" className="mb-3">Featured</Chip>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-3 drop-shadow">
+              {slides[active].title}
+            </h2>
+            {slides[active].description && (
+              <p className="hidden sm:block text-lg text-white/90 mb-5 max-w-[40rem]">
+                {slides[active].description}
+              </p>
+            )}
+            <div className="flex items-center gap-3">
+              <CineButton as={Link} to={`/movie/${slides[active].id}`} className="shadow-lg">
+                Book Now
+              </CineButton>
+              <CineButton as="a" href={`#trailer-${slides[active].id}`} className="!bg-white/6 ">
+                Watch Trailer
+              </CineButton>
+            </div>
+          </div>
+
+          {/* centered indicators (no arrows) */}
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-30 flex items-center gap-2">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                aria-label={`Go to slide ${idx + 1}`}
+                aria-current={idx === active}
+                onClick={() => setActive(idx)}
+                className={`w-3.5 h-3.5 rounded-full transition-transform duration-200 ${
+                  idx === active ? "bg-white scale-110 shadow-lg" : "bg-white/40 hover:bg-white/60"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
