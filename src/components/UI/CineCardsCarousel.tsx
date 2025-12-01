@@ -25,7 +25,7 @@ export function CineCardsCarousel({ cards }: { cards: CineCardData[] }) {
       <h2 className="max-w-7xl pl-4 mx-auto text-3xl md:text-5xl font-bold text-white font-sans mb-8">
         Featured & News
       </h2>
-      <div className="relative max-w-4xl mx-auto">
+      <div className="relative max-w-4xl mx-auto px-4 md:px-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={cards[active].src}
@@ -33,21 +33,21 @@ export function CineCardsCarousel({ cards }: { cards: CineCardData[] }) {
             animate="animate"
             exit="exit"
             variants={variants}
-            className="bg-gradient-to-br from-indigo-900 via-pink-900 to-indigo-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row items-center"
+            className="bg-gradient-to-br from-indigo-900 via-pink-900 to-indigo-700 rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row items-center"
           >
             <img
               src={cards[active].src}
               alt={cards[active].title}
-              className="md:w-1/2 w-full h-80 object-cover object-center rounded-3xl"
+              className="md:w-1/2 w-full h-48 md:h-80 object-cover object-center"
             />
-            <div className="flex-1 p-8 flex flex-col justify-center items-start">
+            <div className="flex-1 p-4 md:p-8 flex flex-col justify-center items-start w-full">
               <span className="uppercase text-xs font-semibold text-pink-400 mb-2 tracking-widest">
                 {cards[active].category}
               </span>
-              <h3 className="text-2xl md:text-4xl font-bold text-white mb-4">
+              <h3 className="text-xl md:text-4xl font-bold text-white mb-2 md:mb-4 line-clamp-2">
                 {cards[active].title}
               </h3>
-              <p className="text-base md:text-lg text-gray-200 mb-6">
+              <p className="text-sm md:text-lg text-gray-200 mb-4 md:mb-6 line-clamp-2 md:line-clamp-3">
                 {cards[active].description}
               </p>
               {cards[active].actionLabel && cards[active].actionLink && (

@@ -3,9 +3,11 @@ import { Chip } from "@heroui/react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
-import { type RootState } from "../store";
+import { type RootState } from "../../../store";
 // replace @heroui Button with your CineButton
-import { CineButton } from "./UI/CineButton";
+import { CineButton } from "../../../components/UI/CineButton";
+import { TrailerModal } from "../../../components/UI/TrailerModal";
+import Countdown from "../../../components/Countdown";
 
 interface Movie {
   id: string;
@@ -13,6 +15,7 @@ interface Movie {
   poster: string;
   description?: string;
   releaseDate?: string;
+  video?: string;
 }
 
 export default function HeroSlider() {
@@ -20,6 +23,8 @@ export default function HeroSlider() {
   const slides = (Array.isArray(movies) ? movies : []).slice(0, 4);
   const [active, setActive] = useState(0);
   const [hovered, setHovered] = useState(false);
+  const [isTrailerModalOpen, setIsTrailerModalOpen] = useState(false);
+  const [selectedTrailerIndex, setSelectedTrailerIndex] = useState(0);
   const count = slides.length;
   const touchStartX = useRef<number | null>(null);
   const mounted = useRef(true);
@@ -128,13 +133,19 @@ export default function HeroSlider() {
               <CineButton as={Link} to={`/movie/${slides[active].id}`} className="shadow-lg">
                 Book Now
               </CineButton>
-              <CineButton as="a" href={`#trailer-${slides[active].id}`} className="!bg-white/6 ">
+              <CineButton as="button" onClick={() => {
+                setSelectedTrailerIndex(active);
+                setIsTrailerModalOpen(true);
+              }} className="!bg-white/6 cursor-target">
                 Watch Trailer
               </CineButton>
             </div>
           </div>
 
-          {/* centered indicators (no arrows) */}
+          {/* moved, enlarged countdown — bottom-right corner, above overlays */}
+          <div className="absolute right-6 bottom-6 z-40">
+            <Countdown targetDate={slides[active].releaseDate} fontSize={30} />
+          </div>
           <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-30 flex items-center gap-2">
             {slides.map((_, idx) => (
               <button
@@ -150,6 +161,12 @@ export default function HeroSlider() {
           </div>
         </div>
       </div>
+      <TrailerModal
+        isOpen={isTrailerModalOpen}
+        videoUrl={slides[selectedTrailerIndex]?.video}
+        title={slides[selectedTrailerIndex]?.title}
+        onClose={() => setIsTrailerModalOpen(false)}
+      />
     </div>
   );
 }

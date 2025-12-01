@@ -12,9 +12,10 @@ export function CineButton({
   children: React.ReactNode;
   as?: React.ElementType;
   className?: string;
+  href?: string;
   [key: string]: unknown;
 }) {
-  const isLink = Component === "a" || (otherProps as any).href;
+  const isLink = Component === "a" || (otherProps as Record<string, unknown>).href;
 
   return (
     <>
@@ -44,11 +45,11 @@ export function CineButton({
 
         .shiny-cta,
         .shiny-cta-link {
-          --shiny-cta-bg: #0b1220;
-          --shiny-cta-bg-subtle: #0f1724;
+          --shiny-cta-bg: #0d3b66;
+          --shiny-cta-bg-subtle: #1a5a8a;
           --shiny-cta-fg: #ffffff;
-          --shiny-cta-highlight: #67e8f9;
-          --shiny-cta-highlight-subtle: #06b6d4;
+          --shiny-cta-highlight: #ffffff;
+          --shiny-cta-highlight-subtle: #e0f7ff;
           --animation: gradient-angle linear infinite;
           --duration: 3s;
           --shadow-size: 2px;
@@ -220,18 +221,18 @@ export function CineButton({
         @media (prefers-color-scheme: light) {
           .shiny-cta,
           .shiny-cta-link {
-            --shiny-cta-bg: #ffffff;
-            --shiny-cta-bg-subtle: #f0f0f0;
-            --shiny-cta-fg: #000000;
-            --shiny-cta-highlight: #06b6d4;
-            --shiny-cta-highlight-subtle: #0891b2;
+            --shiny-cta-bg: #0d3b66;
+            --shiny-cta-bg-subtle: #1a5a8a;
+            --shiny-cta-fg: #ffffff;
+            --shiny-cta-highlight: #ffffff;
+            --shiny-cta-highlight-subtle: #e0f7ff;
           }
         }
       `}</style>
 
       {isLink ? (
         <Component
-          {...(otherProps as any)}
+          {...(otherProps as Record<string, unknown>)}
           className={cn("shiny-cta-link", className)}
         >
           <span>
@@ -241,7 +242,7 @@ export function CineButton({
         </Component>
       ) : (
         <Component
-          {...(otherProps as any)}
+          {...(otherProps as Record<string, unknown>)}
           className={cn("shiny-cta", className)}
         >
           <span>

@@ -47,27 +47,43 @@ const trailers = [
 export default function HotTrailerSection() {
 	const carouselRef = useRef<HTMLDivElement>(null);
 	const [activeTrailer, setActiveTrailer] = useState<null | typeof trailers[0]>(null);
+	const [currentPage, setCurrentPage] = useState(0);
+	const itemsPerPage = 4;
+	const totalPages = Math.ceil(trailers.length / itemsPerPage);
+
+	const handlePaginationClick = (page: number) => {
+		setCurrentPage(page);
+		if (carouselRef.current) {
+			const cardWidth = 280; // md:340px, but we'll use a consistent calculation
+			const gap = 16; // 4 md:gap-8 = 32, but 4 gap = 16
+			const scrollAmount = page * (itemsPerPage * (cardWidth + gap));
+			carouselRef.current.scrollTo({
+				left: scrollAmount,
+				behavior: 'smooth',
+			});
+		}
+	};
 
 	return (
-		<section className="mb-16">
-			<h2 className="text-3xl font-extrabold mb-8 text-white text-center tracking-tight">
+		<section className="mb-16 px-0 md:px-0">
+			<h2 className="text-2xl md:text-3xl font-extrabold mb-6 md:mb-8 text-white text-center tracking-tight px-4">
 				Hot Trailers
 			</h2>
-			<div className="relative w-full flex justify-center">
+			<div className="relative w-full flex justify-center overflow-hidden">
 				<div
 					ref={carouselRef}
-					className="flex gap-8 pb-4"
+					className="flex gap-4 md:gap-8 pb-4 overflow-hidden scroll-smooth w-full"
 					style={{
-						overflowX: "visible",
-						maxWidth: "none",
-						width: "min(100vw, 1800px)",
-						justifyContent: "center",
+						justifyContent: "flex-start",
+						paddingLeft: "1rem",
+						paddingRight: "1rem",
+						scrollBehavior: 'smooth',
 					}}
 				>
 					{trailers.map(trailer => (
 						<motion.div
 							key={trailer.id}
-							className="relative min-w-[340px] max-w-xs bg-gradient-to-br from-indigo-900 via-pink-900 to-indigo-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col cursor-pointer"
+							className="relative min-w-[280px] md:min-w-[340px] max-w-xs bg-gradient-to-br from-indigo-900 via-pink-900 to-indigo-700 rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col cursor-pointer flex-shrink-0"
 							whileHover={{ scale: 1.03, y: -6 }}
 							transition={{ type: 'spring', stiffness: 300, damping: 20 }}
 							onClick={() => setActiveTrailer(trailer)}
@@ -113,6 +129,26 @@ export default function HotTrailerSection() {
 					))}
 				</div>
 			</div>
+
+			{/* Pagination Navigation */}
+			{totalPages > 1 && (
+				<div className="flex justify-center items-center gap-3 mt-8">
+					{Array.from({ length: totalPages }).map((_, index) => (
+						<button
+							key={index}
+							onClick={() => handlePaginationClick(index)}
+							className={`w-10 h-10 rounded-full font-semibold transition-all duration-300 ${
+								currentPage === index
+									? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg scale-110'
+									: 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+							}`}
+						>
+							{index + 1}
+						</button>
+					))}
+				</div>
+			)}
+
 			{/* Modal for expanded trailer */}
 			<AnimatePresence>
 				{activeTrailer && (

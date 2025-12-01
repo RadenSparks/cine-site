@@ -1,5 +1,5 @@
-import { CineButton } from "./UI/CineButton";
-import { cn } from "../lib/utils";
+import { CineButton } from "../../../components/UI/CineButton";
+import { cn } from "../../../lib/utils";
 
 export const BentoGrid = ({
   className,

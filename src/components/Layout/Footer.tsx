@@ -49,7 +49,7 @@ export default function AppFooter() {
         </div>
 
         <div className="border-t border-white/10 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm">&copy; {new Date().getFullYear()} MyShowz. All rights reserved</p>
+          <p className="text-sm">&copy; {new Date().getFullYear()} WyvernBox. All rights reserved</p>
           <div className="flex items-center gap-3 text-white/80">
             <a aria-label="facebook" href="#facebook" className="hover:underline">Facebook</a>
             <a aria-label="linkedin" href="#linkedin" className="hover:underline">LinkedIn</a>

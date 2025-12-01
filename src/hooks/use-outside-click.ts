@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 export const useOutsideClick = (
   ref: React.RefObject<HTMLDivElement>,
@@ -21,4 +22,11 @@ export const useOutsideClick = (
       document.removeEventListener("touchstart", listener);
     };
   }, [ref, callback]);
+};
+
+// Authentication hook for route protection and login checks
+export const useAuth = () => {
+  const user = useSelector((state: { auth: { user: unknown } }) => state.auth.user);
+  const isAuthenticated = user !== null;
+  return { user, isAuthenticated };
 };

@@ -1,16 +1,15 @@
-import { useSelector } from 'react-redux';
-import { type RootState } from '../store';
 import { motion } from "framer-motion";
 
-import AppNavbar from '../components/Layout/Navbar';
-import AppFooter from '../components/Layout/Footer';
-import HeroSlider from '../components/HeroSlider';
-import NowShowingSection from '../components/NowShowingSection';
-import HotTrailerSection from '../components/HotTrailerSection';
-import GiftPromotionsSection from '../components/GiftPromotionsSection';
-import ComingSoonSection from '../components/ComingSoonSection';
-import { CineCardsCarousel } from '../components/UI/CineCardsCarousel';
-import { AuroraBackground } from "../components/Layout/AuroraBackground";
+import AppNavbar from '../../components/Layout/Navbar';
+import AppFooter from '../../components/Layout/Footer';
+import HeroSlider from './components/HeroSlider';
+import NowShowingSection from './components/NowShowingSection';
+import HotMoviesSection from './components/HotMoviesSection';
+import HotTrailerSection from './components/HotTrailerSection';
+import GiftPromotionsSection from './components/GiftPromotionsSection';
+import ComingSoonSection from './components/ComingSoonSection';
+import { CineCardsCarousel } from '../../components/UI/CineCardsCarousel';
+import { AuroraBackground } from "../../components/Layout/AuroraBackground";
 
 const newsCards = [
   {
@@ -40,8 +39,6 @@ const newsCards = [
 ];
 
 export default function HomePage() {
-  // ensure store is initialized and available
-  const storeMovies = useSelector((state: RootState) => state.movies.list);
 
   return (
     <AuroraBackground>
@@ -52,10 +49,10 @@ export default function HomePage() {
         transition={{ delay: 0.2, duration: 0.8, ease: "easeInOut" }}
         className="flex-1 container mx-auto px-4"
       >
-        {/* components now read from the slice directly and limit to 4 items each */}
         <HeroSlider />
+        <HotMoviesSection />
         <NowShowingSection />
-        <ComingSoonSection />
+        <ComingSoonSection /> 
         <CineCardsCarousel cards={newsCards} />
         <HotTrailerSection />
         <GiftPromotionsSection />

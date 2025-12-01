@@ -1,16 +1,18 @@
 import  { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { FilmIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { Button, Avatar , Breadcrumbs } from "@heroui/react";
+import { useSelector } from "react-redux";
+import { FilmIcon } from "@heroicons/react/24/outline";
+import { Breadcrumbs } from "@heroui/react";
 import { type RootState } from "../../store";
-import { logout } from "../../store/authSlice";
 import { cn } from "../../lib/utils";
+import TargetCursor from "./TargetCursor";
+import { UserMenu } from "./UserMenu";
+import "./Navbar.css";
 
 export default function AppNavbar({ className }: { className?: string }) {
   const [active, setActive] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.auth.user);
-  const dispatch = useDispatch();
   const location = useLocation();
 
   // Breadcrumbs based on location
@@ -22,16 +24,18 @@ export default function AppNavbar({ className }: { className?: string }) {
   ];
 
   return (
-    <div className={cn("fixed top-0 left-0 right-0 z-50 mx-auto max-w-5xl", className)}>
-      <nav className="relative flex items-center justify-between px-8 py-4 rounded-b-2xl bg-gradient-to-r from-indigo-900 via-indigo-700 to-pink-900 shadow-xl backdrop-blur-lg border-b border-pink-500/30">
+    <>
+      <TargetCursor targetSelector="button, a[role='button'], [role='button'], .btn, .button, [class*='btn'], [class*='button'], .shiny-cta, .shiny-cta-link, .cursor-target" spinDuration={2} hideDefaultCursor={true} hoverDuration={0.2} parallaxOn={true} />
+      <header className={cn("fixed top-0 left-0 right-0 z-60", className)}>
+      <nav className="navbar-nav mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between px-3 md:px-6 py-3 md:py-4 gap-3 sm:gap-0 bg-gradient-to-r from-indigo-900 via-indigo-700 to-pink-900 shadow-xl backdrop-blur-lg border-b border-pink-500/30 rounded-b-2xl">
         {/* Logo and Brand */}
-        <Link to="/" className="flex items-center gap-2 font-bold text-2xl text-white hover:scale-105 transition-transform">
-          <FilmIcon className="h-8 w-8 text-pink-400 drop-shadow" />
-          CineSite
+        <Link to="/" className="flex items-center gap-2 font-bold text-lg md:text-2xl text-white hover:scale-105 transition-transform flex-shrink-0">
+          <FilmIcon className="h-6 md:h-8 w-6 md:w-8 text-pink-400 drop-shadow" />
+          <span className="hidden sm:inline">CineSite</span>
         </Link>
 
         {/* Menu */}
-        <div className="flex gap-8 text-lg">
+        <div className="flex gap-2 md:gap-8 text-xs md:text-lg flex-wrap justify-center sm:justify-start">
           <MenuItem
             label="Home"
             to="/"
@@ -40,7 +44,7 @@ export default function AppNavbar({ className }: { className?: string }) {
           />
           <MenuItem
             label="Movies"
-            to="/categories"
+              to="/movies"
             active={active === "Movies"}
             setActive={(value) => setActive(value ?? "Movies")}
           />
@@ -59,39 +63,35 @@ export default function AppNavbar({ className }: { className?: string }) {
         </div>
 
         {/* User Menu */}
-        <div>
+        <div className="w-full sm:w-auto">
           {user ? (
-            <div className="flex items-center gap-3">
-              <Avatar name={user.email} icon={<UserCircleIcon className="h-8 w-8" />} />
-              <span className="text-sm text-white">{user.email}</span>
-              <Button color="danger" size="sm" className="shadow-md" onClick={() => dispatch(logout())}>
-                Logout
-              </Button>
+            <div className="flex items-center gap-2 md:gap-3 justify-center sm:justify-end flex-wrap">
+              <UserMenu />
             </div>
           ) : (
-            // point Login button to /auth so it opens the unified auth page
-            <Button color="primary" as={Link} to="/auth" className="shadow-md">
-              Login
-            </Button>
+            <Link to="/auth" className="navbar-login-btn w-full sm:w-auto text-center">
+              <span>Login</span>
+            </Link>
           )}
         </div>
       </nav>
-      {/* Optional: Add a subtle divider or shadow */}
-      <div className="h-2 bg-gradient-to-r from-pink-500/30 via-indigo-700/30 to-indigo-900/30 rounded-b-2xl"></div>
-      <div className="container mx-auto px-4 py-2">
+
+      {/* Breadcrumbs with adjusted container */}
+      <div className="mx-auto max-w-7xl px-6 py-2">
         <Breadcrumbs>
           {crumbs.map((crumb) => (
-            <Link key={crumb.href} to={crumb.href}>
+            <Link key={crumb.href} to={crumb.href} className="text-white/70 hover:text-white">
               {crumb.label}
             </Link>
           ))}
         </Breadcrumbs>
       </div>
-    </div>
+    </header>
+    </>
   );
 }
 
-// MenuItem with hover effect
+// MenuItem with hover effect and cursor target
 function MenuItem({
   label,
   to,
@@ -106,8 +106,9 @@ function MenuItem({
   return (
     <Link
       to={to}
+      role="button"
       className={cn(
-        "relative px-3 py-1 rounded transition-all duration-200",
+        "btn relative px-2 md:px-3 py-1 rounded transition-all duration-200 whitespace-nowrap",
         active
           ? "bg-pink-500/30 text-white shadow-lg"
           : "text-white/80 hover:bg-indigo-700/40 hover:text-white"
