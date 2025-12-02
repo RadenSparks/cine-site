@@ -308,8 +308,9 @@ const moviesSlice = createSlice({
     setMoviesLoading: (state) => {
       state.isLoading = true;
     },
-    setMoviesLoaded: (state) => {
+    setMoviesLoaded: (state, action) => {
       state.isLoading = false;
+      state.list = action.payload;
     },
   },
 });

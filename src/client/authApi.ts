@@ -10,6 +10,10 @@ import type {
   ProfileUpdateRequestDTO,
   ProfileUpdateResponseDTO,
   GetProfileResponseDTO,
+  GenreDTO,
+  MovieResponseDTO,
+  ApiResponseWrapper,
+  PaginatedResponse,
 } from '../types/auth';
 
 /**
@@ -126,3 +130,60 @@ export const updateUserProfile = async (
   }
 };
 
+/**
+ * Fetch all genres
+ * GET /api/v1/genres
+ */
+export const fetchAllGenres = async (): Promise<GenreDTO[]> => {
+  try {
+    const response = await get<ApiResponseWrapper<GenreDTO[]>>(
+      '/genres'
+    );
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Failed to fetch genres:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch all movies with pagination
+ * GET /api/v1/movies?page=0&size=10
+ */
+export const fetchAllMovies = async (
+  page: number = 0,
+  size: number = 10
+): Promise<{ movies: MovieResponseDTO[]; totalPages: number; totalElements: number }> => {
+  try {
+    const response = await get<ApiResponseWrapper<PaginatedResponse<MovieResponseDTO>>>(
+      `/movies?page=${page}&size=${size}`
+    );
+    const data = response.data.data;
+    return {
+      movies: data.content || [],
+      totalPages: data.totalPages,
+      totalElements: data.totalElements,
+    };
+  } catch (error) {
+    console.error('Failed to fetch movies:', error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch movie by ID
+ * GET /api/v1/movies/{id}
+ */
+export const fetchMovieById = async (
+  id: number
+): Promise<MovieResponseDTO> => {
+  try {
+    const response = await get<ApiResponseWrapper<MovieResponseDTO>>(
+      `/movies/${id}`
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error(`Failed to fetch movie with id ${id}:`, error);
+    throw error;
+  }
+};

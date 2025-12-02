@@ -175,17 +175,7 @@ export default function AuthPage() {
       setAuthAnimating(true);
       console.log('🎬 Auth animation started - blocking PublicRoute redirects');
 
-      // Show notification first
-      showNotification(
-        "success",
-        "Login Successful",
-        "Welcome back!"
-      );
-
-      // Give notification time to render (100ms)
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Start loader animation AFTER notification is visible
+      // Start loader animation WITHOUT showing notification yet
       setLoginLoading(true);
 
       // Clear the form
@@ -280,13 +270,24 @@ export default function AuthPage() {
           navigate("/");
           console.log('✅ Navigation completed');
           
-          // CRITICAL: Clear animation flag AFTER navigation completes
-          // Use a small delay to ensure React Router commits the route change
-          // before allowing PublicRoute to evaluate again
+          // Show success notification AFTER navigation completes
+          // Small delay to ensure DOM is ready
           setTimeout(() => {
-            setAuthAnimating(false);
-            console.log('🎬 Auth animation ended - PublicRoute can redirect again');
-          }, 50);
+            showNotification(
+              "success",
+              "Login Successful",
+              "Welcome back!"
+            );
+            console.log('🎉 Success notification shown');
+            
+            // CRITICAL: Clear animation flag AFTER notification shown
+            // Use a small delay to ensure React Router commits the route change
+            // before allowing PublicRoute to evaluate again
+            setTimeout(() => {
+              setAuthAnimating(false);
+              console.log('🎬 Auth animation ended - PublicRoute can redirect again');
+            }, 50);
+          }, 100);
         } else {
           console.log('⚠️  Navigation already happened');
           setAuthAnimating(false);

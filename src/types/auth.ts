@@ -114,3 +114,52 @@ export type User = {
   password ?: string;
   accessToken: string;
 };
+
+/**
+ * Genre DTO - Matches backend Genre entity
+ */
+export type GenreDTO = {
+  id: number;
+  name: string;
+  icon?: string;
+};
+
+/**
+ * Movie Response DTO - Matches backend MovieResponseDTO
+ */
+export type MovieResponseDTO = {
+  id: number;
+  title: string;
+  description: string;
+  poster: string;
+  rating: number;
+  premiereDate: string; // LocalDate as ISO string
+  duration: number; // in minutes
+  genres: GenreDTO[];
+  deleted: boolean;
+  teaser?: string;
+};
+
+/**
+ * API Response wrapper - Matches backend ApiResponse<T>
+ */
+export type ApiResponseWrapper<T> = {
+  status: 'SUCCESS' | 'FAILURE' | 'ERROR';
+  data: T;
+  message?: string;
+};
+
+/**
+ * Paginated Response - For paginated endpoints
+ */
+export type PaginatedResponse<T> = {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+};
