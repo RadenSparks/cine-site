@@ -5,5 +5,6 @@ export { useAuth } from './useAuth';
 export { useLogout } from './useLogout';
 export { useMovies } from './useMovies';
 export { useGenres } from './useGenres';
+export { usePublicMovies, usePublicGenres, usePublicMoviesAndGenres } from './usePublicMovies';
 export { useBookings } from './useBookings';
 export { useOutsideClick } from './use-outside-click';

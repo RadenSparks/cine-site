@@ -1,6 +1,8 @@
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useState, useCallback } from 'react';
-import { useMovies, useBookings } from '../../hooks';
+import { useState, useCallback, useEffect } from 'react';
+import { useBookings } from '../../hooks';
+import { usePublicMovies } from '../../hooks';
+import type { MovieResponseDTO } from '../../types/auth';
 import { motion } from 'framer-motion';
 import Stepper, { Step } from '../../components/UI/Stepper';
 import { AuroraBackground } from '../../components/Layout/AuroraBackground';
@@ -50,10 +52,27 @@ export default function BookingPage() {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { getMovieById } = useMovies();
+  const { fetchMovieById } = usePublicMovies();
   const { addBooking } = useBookings();
-  const movie = getMovieById(id || '');
+  
+  const [movie, setMovie] = useState<MovieResponseDTO | null>(
+    (location.state?.movie as MovieResponseDTO) || null
+  );
+  const [isLoading, setIsLoading] = useState(!(location.state?.movie));
   const initialSeats: string[] = location.state?.seats?.map((s: number | string) => s.toString()) || [];
+
+  // Fetch movie on mount only if not already provided through state
+  useEffect(() => {
+    if (!movie && id) {
+      setIsLoading(true);
+      const fetchMovie = async () => {
+        const movieData = await fetchMovieById(parseInt(id));
+        setMovie(movieData);
+        setIsLoading(false);
+      };
+      fetchMovie();
+    }
+  }, [id, fetchMovieById, movie]);
 
   const [bookingData, setBookingData] = useState<BookingData>({
     movieId: id || '',
@@ -139,6 +158,23 @@ export default function BookingPage() {
     navigate('/');
   }, [bookingData.movieId, bookingData.seats, bookingData.customerName, addBooking, navigate]);
 
+  if (isLoading) {
+    return (
+      <AuroraBackground>
+        <AppNavbar />
+        <motion.main
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex-1 container mx-auto px-4 py-12 flex items-center justify-center min-h-screen"
+        >
+          <div className="text-white">Loading booking details...</div>
+        </motion.main>
+        <AppFooter />
+      </AuroraBackground>
+    );
+  }
+
   if (!movie) {
     return <NotFoundPage title="Movie Not Found" description="The movie you're looking for doesn't exist or has been removed." backButtonPath="/movies" />;
   }
@@ -187,7 +223,7 @@ export default function BookingPage() {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">Show Time Selection</h2>
+                <h2 className="text-3xl font-title font-bold text-white mb-2">Show Time Selection</h2>
                 <p className="text-slate-100 font-semibold drop-shadow-md">Choose your preferred show time and date</p>
               </div>
 
@@ -200,12 +236,12 @@ export default function BookingPage() {
                     className="w-24 h-32 rounded-lg object-cover"
                   />
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-white mb-2">{movie.title}</h3>
+                    <h3 className="text-2xl font-title font-bold text-white mb-2">{movie.title}</h3>
                     <p className="text-slate-100 mb-4 drop-shadow-md">{movie.description?.substring(0, 150)}...</p>
                     <div className="flex gap-4">
                       {movie.genres?.slice(0, 3).map(genre => (
-                        <span key={genre} className="px-3 py-1 bg-purple-500/20 border border-purple-500/50 text-purple-200 text-sm rounded-full">
-                          {genre}
+                        <span key={genre.id} className="px-3 py-1 bg-purple-500/20 border border-purple-500/50 text-purple-200 text-sm rounded-full font-label">
+                          {genre.name}
                         </span>
                       ))}
                     </div>
@@ -216,9 +252,9 @@ export default function BookingPage() {
               {/* Date Selection */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-white font-semibold">Select Date</label>
+                  <label className="block text-white font-label font-semibold">Select Date</label>
                   {!bookingData.showDate && (
-                    <span className="text-red-400 text-sm font-medium">Required</span>
+                    <span className="text-red-400 text-sm font-medium font-body">Required</span>
                   )}
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
@@ -236,8 +272,8 @@ export default function BookingPage() {
                             : 'bg-slate-800 text-slate-100 hover:bg-slate-700'
                         }`}
                       >
-                        <div className="text-sm">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                        <div className="text-lg">{date.getDate()}</div>
+                        <div className="text-sm font-body">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                        <div className="text-lg font-body">{date.getDate()}</div>
                       </button>
                     );
                   })}
@@ -247,9 +283,9 @@ export default function BookingPage() {
               {/* Time Selection */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-white font-semibold">Select Time</label>
+                  <label className="block text-white font-label font-semibold">Select Time</label>
                   {!bookingData.showTime && (
-                    <span className="text-red-400 text-sm font-medium">Required</span>
+                    <span className="text-red-400 text-sm font-medium font-body">Required</span>
                   )}
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
@@ -292,11 +328,11 @@ export default function BookingPage() {
               <div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-2">Seat Selection</h2>
+                    <h2 className="text-3xl font-title font-bold text-white mb-2">Seat Selection</h2>
                     <p className="text-slate-400">Your selected seats: <span className="text-cyan-400 font-semibold">{bookingData.seats.join(', ') || 'None selected'}</span></p>
                   </div>
                   {!isStep2Valid && (
-                    <span className="text-red-400 text-sm font-medium bg-red-500/20 border border-red-500/50 px-3 py-1 rounded-lg">
+                    <span className="text-red-400 text-sm font-medium bg-red-500/20 border border-red-500/50 px-3 py-1 rounded-lg font-body">
                       Select at least 1 seat
                     </span>
                   )}
@@ -308,7 +344,7 @@ export default function BookingPage() {
                 <div className="lg:col-span-2">
                   <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/50 border border-white/10 rounded-xl p-8">
                     <div className="text-center mb-6">
-                      <p className="text-slate-300 text-lg font-semibold">Screen</p>
+                      <p className="text-slate-300 text-lg font-semibold font-label">Screen</p>
                       <div className="w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mt-4 rounded-full"></div>
                     </div>
 
@@ -316,7 +352,7 @@ export default function BookingPage() {
                     <div className="space-y-3 max-w-2xl mx-auto">
                       {['A', 'B', 'C', 'D', 'E'].map(row => (
                         <div key={row} className="flex justify-center gap-2">
-                          <span className="w-8 flex items-center justify-center text-white text-sm font-bold drop-shadow-md">{row}</span>
+                          <span className="w-8 flex items-center justify-center text-white text-sm font-bold drop-shadow-md font-body">{row}</span>
                           <div className="flex gap-2">
                             {[1, 2, 3, 4, 5, 6, 7, 8].map(col => {
                               const seatNum = `${row}${col}`;
@@ -354,15 +390,15 @@ export default function BookingPage() {
                     <div className="flex justify-center gap-6 mt-8 flex-wrap">
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-slate-700 rounded"></div>
-                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md">Available</span>
+                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Available</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-yellow-600/60 rounded border border-yellow-500/50"></div>
-                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md">Premium (₹300)</span>
+                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Premium (₹300)</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 bg-gradient-to-r from-purple-600 to-pink-500 rounded"></div>
-                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md">Selected</span>
+                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Selected</span>
                       </div>
                     </div>
                   </div>
@@ -371,20 +407,20 @@ export default function BookingPage() {
                 {/* Booking Summary - Right Column */}
                 <div className="space-y-4">
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
-                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide">Show Time</p>
-                    <p className="text-white font-bold text-lg mt-1">{bookingData.showTime}</p>
+                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Show Time</p>
+                    <p className="text-white font-bold text-lg mt-1 font-body">{bookingData.showTime}</p>
                   </div>
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
-                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide">Selected Seats</p>
-                    <p className="text-white font-bold text-lg mt-1">{bookingData.seats.length} Seat{bookingData.seats.length !== 1 ? 's' : ''}</p>
+                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Selected Seats</p>
+                    <p className="text-white font-bold text-lg mt-1 font-body">{bookingData.seats.length} Seat{bookingData.seats.length !== 1 ? 's' : ''}</p>
                   </div>
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
-                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide">Standard Seats</p>
-                    <p className="text-white font-bold text-lg mt-1">{bookingData.seats.filter(s => !premiumSeats.includes(s)).length} × ₹250</p>
+                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Standard Seats</p>
+                    <p className="text-white font-bold text-lg mt-1 font-body">{bookingData.seats.filter(s => !premiumSeats.includes(s)).length} × ₹250</p>
                   </div>
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
-                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide">Premium Seats</p>
-                    <p className="text-yellow-300 font-bold text-lg mt-1">{bookingData.seats.filter(s => premiumSeats.includes(s)).length} × ₹300</p>
+                    <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Premium Seats</p>
+                    <p className="text-yellow-300 font-bold text-lg mt-1 font-body">{bookingData.seats.filter(s => premiumSeats.includes(s)).length} × ₹300</p>
                   </div>
                   <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/50 rounded-lg p-4 sticky top-4">
                     <div className="flex flex-col gap-2">
@@ -418,13 +454,13 @@ export default function BookingPage() {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">Passenger Details</h2>
+                <h2 className="text-3xl font-title font-bold text-white mb-2">Passenger Details</h2>
                 <p className="text-slate-100 font-semibold drop-shadow-md">Enter your information</p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-white font-semibold mb-2">
+                  <label className="block text-white font-label font-semibold mb-2">
                     Full Name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -439,12 +475,12 @@ export default function BookingPage() {
                     }`}
                   />
                   {!bookingData.customerName.trim() && (
-                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md">Name is required</p>
+                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md font-body">Name is required</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-white font-semibold mb-2">
+                  <label className="block text-white font-label font-semibold mb-2">
                     Email Address <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -459,15 +495,15 @@ export default function BookingPage() {
                     }`}
                   />
                   {bookingData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bookingData.email) && (
-                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md">Please enter a valid email</p>
+                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md font-body">Please enter a valid email</p>
                   )}
                   {!bookingData.email.trim() && (
-                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md">Email is required</p>
+                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md font-body">Email is required</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-white font-semibold mb-2">
+                  <label className="block text-white font-label font-semibold mb-2">
                     Phone Number <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -482,10 +518,10 @@ export default function BookingPage() {
                     }`}
                   />
                   {bookingData.phone.trim() && !/^[0-9+\-\s()]+$/.test(bookingData.phone) && (
-                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md">Please enter a valid phone number</p>
+                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md font-body">Please enter a valid phone number</p>
                   )}
                   {!bookingData.phone.trim() && (
-                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md">Phone number is required</p>
+                    <p className="text-red-300 text-sm mt-2 font-semibold drop-shadow-md font-body">Phone number is required</p>
                   )}
                 </div>
               </div>
@@ -511,7 +547,7 @@ export default function BookingPage() {
               className="space-y-6"
             >
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">Payment</h2>
+                <h2 className="text-3xl font-title font-bold text-white mb-2">Payment</h2>
                 <p className="text-slate-100 font-semibold drop-shadow-md">Complete your booking with secure payment</p>
               </div>
 
@@ -564,7 +600,7 @@ export default function BookingPage() {
                   {bookingData.paymentMethod === 'card' && (
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/50 border border-white/10 rounded-xl p-6 space-y-4">
                       <div>
-                        <label className="block text-white font-semibold mb-2">Cardholder Name</label>
+                        <label className="block text-white font-label font-semibold mb-2">Cardholder Name</label>
                         <input
                           type="text"
                           placeholder="Name on card"
@@ -573,7 +609,7 @@ export default function BookingPage() {
                       </div>
 
                       <div>
-                        <label className="block text-white font-semibold mb-2">Card Number</label>
+                        <label className="block text-white font-label font-semibold mb-2">Card Number</label>
                         <input
                           type="text"
                           placeholder="XXXX XXXX XXXX XXXX"
@@ -583,7 +619,7 @@ export default function BookingPage() {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-white font-semibold mb-2">Expiry Month</label>
+                          <label className="block text-white font-label font-semibold mb-2">Expiry Month</label>
                           <input
                             type="text"
                             placeholder="MM"
@@ -591,7 +627,7 @@ export default function BookingPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-white font-semibold mb-2">CVV</label>
+                          <label className="block text-white font-label font-semibold mb-2">CVV</label>
                           <input
                             type="text"
                             placeholder="XXX"
@@ -606,7 +642,7 @@ export default function BookingPage() {
                 {/* Order Summary - Right Column */}
                 <div>
                   <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/50 rounded-xl p-6 sticky top-4">
-                    <h3 className="text-white font-bold mb-4 text-lg drop-shadow-md">Order Summary</h3>
+                    <h3 className="text-white font-title font-bold mb-4 text-lg drop-shadow-md">Order Summary</h3>
                     <div className="space-y-3">
                       {bookingData.seats.filter(s => !premiumSeats.includes(s)).length > 0 && (
                         <div className="flex justify-between text-white font-semibold drop-shadow-md">

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import MagicText from "./MagicText";
 import { CineButton } from "./CineButton";
 
 interface CineCardData {
@@ -22,9 +23,7 @@ export function CineCardsCarousel({ cards }: { cards: CineCardData[] }) {
 
   return (
     <div className="w-full h-full py-20">
-      <h2 className="max-w-7xl pl-4 mx-auto text-3xl md:text-5xl font-bold text-white font-sans mb-8">
-        Featured & News
-      </h2>
+      <MagicText gradientColors={["#fff", "#e5e7eb", "#f3f4f6", "#d1d5db"]} starColors={["#fff", "#e5e7eb", "#f3f4f6", "#d1d5db"]} starCount={4} gradientSpeed="2.5s" sparkleFrequency={1200} starSize="clamp(18px,2vw,32px)" className="max-w-7xl pl-4 mx-auto text-3xl sm:text-4xl md:text-5xl font-title font-bold leading-tight mb-8 block">Featured & News</MagicText>
       <div className="relative max-w-4xl mx-auto px-4 md:px-0">
         <AnimatePresence mode="wait">
           <motion.div
@@ -41,13 +40,13 @@ export function CineCardsCarousel({ cards }: { cards: CineCardData[] }) {
               className="md:w-1/2 w-full h-48 md:h-80 object-cover object-center"
             />
             <div className="flex-1 p-4 md:p-8 flex flex-col justify-center items-start w-full">
-              <span className="uppercase text-xs font-semibold text-pink-400 mb-2 tracking-widest">
+              <span className="uppercase text-xs font-label font-semibold text-pink-400 mb-2 tracking-widest">
                 {cards[active].category}
               </span>
-              <h3 className="text-xl md:text-4xl font-bold text-white mb-2 md:mb-4 line-clamp-2">
+              <h3 className="text-xl md:text-4xl font-title font-bold text-white mb-2 md:mb-4 line-clamp-2">
                 {cards[active].title}
               </h3>
-              <p className="text-sm md:text-lg text-gray-200 mb-4 md:mb-6 line-clamp-2 md:line-clamp-3">
+              <p className="text-sm md:text-lg font-body text-gray-200 mb-4 md:mb-6 line-clamp-2 md:line-clamp-3">
                 {cards[active].description}
               </p>
               {cards[active].actionLabel && cards[active].actionLink && (

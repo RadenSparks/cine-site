@@ -27,15 +27,15 @@ export default function AppNavbar({ className }: { className?: string }) {
     <>
       <TargetCursor targetSelector="button, a[role='button'], [role='button'], .btn, .button, [class*='btn'], [class*='button'], .shiny-cta, .shiny-cta-link, .cursor-target" spinDuration={2} hideDefaultCursor={true} hoverDuration={0.2} parallaxOn={true} />
       <header className={cn("fixed top-0 left-0 right-0 z-60", className)}>
-      <nav className="navbar-nav mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between px-3 md:px-6 py-3 md:py-4 gap-3 sm:gap-0 bg-gradient-to-r from-indigo-900 via-indigo-700 to-pink-900 shadow-xl backdrop-blur-lg border-b border-pink-500/30 rounded-b-2xl">
+      <nav className="navbar-nav mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between px-3 md:px-6 py-3 md:py-4 gap-3 sm:gap-0 shadow-xl backdrop-blur-lg rounded-b-2xl" style={{ backgroundImage: "linear-gradient(to right, #020617 0%, #1f2933 50%, #b91c1c 100%)", borderBottom: "2px solid #ea580c" }}>
         {/* Logo and Brand */}
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg md:text-2xl text-white hover:scale-105 transition-transform flex-shrink-0">
-          <FilmIcon className="h-6 md:h-8 w-6 md:w-8 text-pink-400 drop-shadow" />
+        <Link to="/" className="flex items-center gap-2 font-title font-bold text-xl md:text-3xl text-white hover:scale-105 transition-transform flex-shrink-0">
+          <FilmIcon className="h-6 md:h-8 w-6 md:w-8 drop-shadow" style={{ color: "#ea580c" }} />
           <span className="hidden sm:inline">CineSite</span>
         </Link>
 
         {/* Menu */}
-        <div className="flex gap-2 md:gap-8 text-xs md:text-lg flex-wrap justify-center sm:justify-start">
+        <div className="flex gap-2 md:gap-8 font-button text-sm md:text-xl flex-wrap justify-center sm:justify-start font-bold tracking-wide">
           <MenuItem
             label="Home"
             to="/"
@@ -108,17 +108,17 @@ function MenuItem({
       to={to}
       role="button"
       className={cn(
-        "btn relative px-2 md:px-3 py-1 rounded transition-all duration-200 whitespace-nowrap",
+        "btn relative px-2 md:px-3 py-1 rounded transition-all duration-200 whitespace-nowrap font-button text-base md:text-lg font-bold tracking-wide",
         active
-          ? "bg-pink-500/30 text-white shadow-lg"
-          : "text-white/80 hover:bg-indigo-700/40 hover:text-white"
+          ? "bg-orange-600/40 text-white shadow-lg"
+          : "text-white/80 hover:bg-orange-700/30 hover:text-white"
       )}
       onMouseEnter={() => setActive(label)}
       onMouseLeave={() => setActive(null)}
     >
       {label}
       {active && (
-        <span className="absolute left-0 right-0 -bottom-1 h-1 bg-pink-400 rounded-full blur-sm opacity-70"></span>
+        <span className="absolute left-0 right-0 -bottom-1 h-1 bg-orange-500 rounded-full blur-sm opacity-70"></span>
       )}
     </Link>
   );

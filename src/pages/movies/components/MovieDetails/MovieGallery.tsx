@@ -15,7 +15,7 @@ export function MovieGallery({ galleryImages, onImageClick }: MovieGalleryProps)
       className="mb-16"
     >
       <div className="bg-slate-900/70 p-4 rounded-lg border border-purple-400/30 mb-6">
-        <h2 className="text-2xl font-bold text-white">Movie Gallery</h2>
+        <h2 className="text-2xl font-title font-bold text-white">Movie Gallery</h2>
       </div>
       <BentoGrid
         mainAspect="4/3"
@@ -61,7 +61,7 @@ export function MovieGallery({ galleryImages, onImageClick }: MovieGalleryProps)
               className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-              <p className="text-white font-semibold text-sm">Scene 2</p>
+              <p className="text-white font-semibold text-sm font-label">Scene 2</p>
             </div>
           </motion.div>
         }
@@ -78,7 +78,7 @@ export function MovieGallery({ galleryImages, onImageClick }: MovieGalleryProps)
               className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-              <p className="text-white font-semibold text-sm">Scene 3</p>
+              <p className="text-white font-semibold text-sm font-label">Scene 3</p>
             </div>
           </motion.div>
         }
@@ -98,7 +98,7 @@ export function MovieGallery({ galleryImages, onImageClick }: MovieGalleryProps)
                   className="w-full h-full object-cover group-hover:brightness-75 transition-all duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <p className="text-white font-semibold text-xs">
+                  <p className="text-white font-semibold text-xs font-label">
                     Scene {index + 4}
                   </p>
                 </div>

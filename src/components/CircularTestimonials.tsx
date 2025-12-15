@@ -121,9 +121,9 @@ export function CircularTestimonials({
   );
 
   // Styles
-  const nameStyle = useMemo(() => ({ color: colorName, fontSize: fontSizeName }), [colorName, fontSizeName]);
-  const designationStyle = useMemo(() => ({ color: colorDesignation, fontSize: fontSizeDesignation }), [colorDesignation, fontSizeDesignation]);
-  const quoteStyle = useMemo(() => ({ color: colorTestimony, fontSize: fontSizeQuote }), [colorTestimony, fontSizeQuote]);
+  const nameStyle = useMemo(() => ({ color: colorName, fontSize: fontSizeName, fontFamily: 'IM Fell French Canon SC' }), [colorName, fontSizeName]);
+  const designationStyle = useMemo(() => ({ color: colorDesignation, fontSize: fontSizeDesignation, fontFamily: 'Montserrat Alternates' }), [colorDesignation, fontSizeDesignation]);
+  const quoteStyle = useMemo(() => ({ color: colorTestimony, fontSize: fontSizeQuote, fontFamily: 'Crimson Text' }), [colorTestimony, fontSizeQuote]);
   const [hoveredImages, setHoveredImages] = useState<boolean[]>(
     new Array(testimonials.length).fill(false)
   );

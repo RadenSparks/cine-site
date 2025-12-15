@@ -1,26 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Chip } from "@heroui/react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSelector } from "react-redux";
-import { type RootState } from "../../../store";
-// replace @heroui Button with your CineButton
+import MagicText from "../../../components/UI/MagicText";
 import { CineButton } from "../../../components/UI/CineButton";
 import { TrailerModal } from "../../../components/UI/TrailerModal";
 import Countdown from "../../../components/Countdown";
+import type { MovieResponseDTO } from '../../../types/auth';
 
-interface Movie {
-  id: string;
-  title: string;
-  poster: string;
-  description?: string;
-  releaseDate?: string;
-  video?: string;
+interface HeroSliderProps {
+  movies?: MovieResponseDTO[];
+  isLoading?: boolean;
 }
 
-export default function HeroSlider() {
-  const movies = useSelector((s: RootState) => s.movies.list) as Movie[] | undefined;
-  const slides = (Array.isArray(movies) ? movies : []).slice(0, 4);
+export default function HeroSlider({ movies = [] }: HeroSliderProps) {
+  const slides = movies.slice(0, 4);
   const [active, setActive] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [isTrailerModalOpen, setIsTrailerModalOpen] = useState(false);
@@ -73,13 +66,16 @@ export default function HeroSlider() {
 
   if (!count) return null;
 
+  const currentSlide = slides[active];
+  if (!currentSlide) return null;
+
   const slideVariants = {
     initial: { scale: 0.98, opacity: 0, y: 16 },
     visible: {
       scale: 1,
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: [0.215, 0.61, 0.355, 1] },
+      transition: { duration: 0.7 },
     },
     exitUp: { opacity: 0, y: -12, transition: { duration: 0.6 } },
     exitDown: { opacity: 0, y: 12, transition: { duration: 0.6 } },
@@ -100,9 +96,9 @@ export default function HeroSlider() {
         <div className="relative h-[420px] sm:h-[520px] md:h-[620px] lg:h-[720px]">
           <AnimatePresence mode="wait" initial={false}>
             <motion.img
-              key={slides[active].id}
-              src={slides[active].poster}
-              alt={slides[active].title}
+              key={`slide-${currentSlide.id}`}
+              src={currentSlide.poster}
+              alt={currentSlide.title}
               initial="initial"
               animate="visible"
               exit={hovered ? "exitDown" : "exitUp"}
@@ -120,17 +116,19 @@ export default function HeroSlider() {
 
           {/* content */}
           <div className="absolute left-6 sm:left-10 md:left-14 bottom-8 sm:bottom-16 z-20 max-w-xl text-white">
-            <Chip color="primary" className="mb-3">Featured</Chip>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-3 drop-shadow">
-              {slides[active].title}
+            <div className="mb-3">
+              <MagicText gradientColors={["#fff", "#e5e7eb", "#f3f4f6", "#d1d5db"]} starColors={["#fff", "#e5e7eb", "#f3f4f6", "#d1d5db"]} starCount={2} gradientSpeed="2.5s" sparkleFrequency={1200} starSize="clamp(12px,1.5vw,20px)" className="text-lg sm:text-xl font-title font-bold leading-tight">Featured</MagicText>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-title font-extrabold leading-tight mb-3 drop-shadow">
+              {currentSlide.title}
             </h2>
-            {slides[active].description && (
-              <p className="hidden sm:block text-lg text-white/90 mb-5 max-w-[40rem]">
-                {slides[active].description}
+            {currentSlide.description && (
+              <p className="hidden sm:block text-lg md:text-xl font-body font-semibold text-white/90 mb-5 max-w-[40rem] leading-relaxed">
+                {currentSlide.description}
               </p>
             )}
             <div className="flex items-center gap-3">
-              <CineButton as={Link} to={`/movie/${slides[active].id}`} className="shadow-lg">
+              <CineButton as={Link} to={`/movie/${currentSlide.id}`} className="shadow-lg">
                 Book Now
               </CineButton>
               <CineButton as="button" onClick={() => {
@@ -144,7 +142,7 @@ export default function HeroSlider() {
 
           {/* moved, enlarged countdown — bottom-right corner, above overlays */}
           <div className="absolute right-6 bottom-6 z-40">
-            <Countdown targetDate={slides[active].releaseDate} fontSize={30} />
+            <Countdown targetDate={currentSlide.premiereDate} fontSize={30} />
           </div>
           <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-30 flex items-center gap-2">
             {slides.map((_, idx) => (
@@ -163,8 +161,8 @@ export default function HeroSlider() {
       </div>
       <TrailerModal
         isOpen={isTrailerModalOpen}
-        videoUrl={slides[selectedTrailerIndex]?.video}
-        title={slides[selectedTrailerIndex]?.title}
+        videoUrl={currentSlide.teaser}
+        title={currentSlide.title}
         onClose={() => setIsTrailerModalOpen(false)}
       />
     </div>

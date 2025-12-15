@@ -157,13 +157,17 @@ export default function TransactionsPage() {
 
   return (
     <motion.div
-      className="min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-pink-900 px-4 sm:px-6 lg:px-8 pt-16 pb-8"
+      className="min-h-screen px-4 sm:px-6 lg:px-8 pt-16 pb-8"
+      style={{
+        backgroundImage: "linear-gradient(135deg, #221824 0%, #5a314b 30%, #b14f4a 60%, #f28b6b 100%)",
+        backgroundAttachment: "fixed",
+      }}
     >
       <TargetCursor targetSelector="button, a[role='button'], [role='button'], .btn, .button, [class*='btn'], [class*='button'], .shiny-cta, .shiny-cta-link, .cursor-target" spinDuration={2} hideDefaultCursor={true} hoverDuration={0.2} parallaxOn={true} />
-      {/* Animated background elements */}
+      {/* Animated background elements - glowing embers */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-red-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ backgroundImage: "linear-gradient(to bottom right, rgba(242, 139, 107, 0.4), rgba(177, 79, 74, 0.4))" }}></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000" style={{ backgroundImage: "linear-gradient(to bottom right, rgba(177, 79, 74, 0.4), rgba(90, 49, 75, 0.4))" }}></div>
       </div>
 
       <div className="relative w-full mx-auto">
@@ -185,11 +189,11 @@ export default function TransactionsPage() {
               transition={{ duration: 0.5 }}
             >
               {/* Header */}
-              <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-6 py-8">
+              <div className="relative px-6 py-8" style={{ backgroundImage: "linear-gradient(to right, #5a314b, #b14f4a, #f28b6b)" }}>
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="relative flex items-center gap-3">
                   <ClipboardDocumentListIcon className="w-8 h-8 text-white" />
-                  <h1 className="text-3xl font-bold text-white">
+                  <h1 className="text-3xl font-title font-bold text-white">
                     Transaction History
                   </h1>
                 </div>
@@ -197,15 +201,15 @@ export default function TransactionsPage() {
 
               {/* Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 sm:p-8 border-b border-white/10">
-                <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-400/30 rounded-lg p-5">
-                  <p className="text-indigo-100 text-sm mb-2">Total Spent</p>
-                  <p className="text-3xl sm:text-4xl font-bold text-blue-300">
+                <div className="rounded-lg p-5 border" style={{ backgroundColor: "rgba(242, 139, 107, 0.15)", borderColor: "rgba(242, 139, 107, 0.5)" }}>
+                  <p className="text-amber-100 text-sm mb-2 font-label">Total Spent</p>
+                  <p className="text-3xl sm:text-4xl font-title font-bold" style={{ color: "#f28b6b" }}>
                     ${totalSpent.toFixed(2)}
                   </p>
                 </div>
-                <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 border border-green-400/30 rounded-lg p-5">
-                  <p className="text-indigo-100 text-sm mb-2">Total Refunded</p>
-                  <p className="text-3xl sm:text-4xl font-bold text-green-300">
+                <div className="rounded-lg p-5 border" style={{ backgroundColor: "rgba(177, 79, 74, 0.15)", borderColor: "rgba(177, 79, 74, 0.5)" }}>
+                  <p className="text-amber-100 text-sm mb-2 font-label">Total Refunded</p>
+                  <p className="text-3xl sm:text-4xl font-title font-bold" style={{ color: "#b14f4a" }}>
                     ${totalRefunds.toFixed(2)}
                   </p>
                 </div>
@@ -218,7 +222,7 @@ export default function TransactionsPage() {
                     <button
                       key={f}
                       onClick={() => setFilter(f)}
-                      className={`btn px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                      className={`btn px-4 py-2 rounded-lg transition-all duration-200 text-sm font-button font-medium ${
                         filter === f
                           ? "bg-pink-500/40 border border-pink-400/50 text-white"
                           : "bg-white/5 border border-white/10 text-indigo-100 hover:bg-white/10"
@@ -235,7 +239,7 @@ export default function TransactionsPage() {
                 {filteredTransactions.length === 0 ? (
                   <div className="text-center py-12">
                     <ClipboardDocumentListIcon className="w-16 h-16 text-indigo-300 mx-auto mb-4 opacity-50" />
-                    <p className="text-indigo-100 text-lg">
+                    <p className="text-indigo-100 text-lg font-body">
                       No {filter !== "all" ? filter : ""} transactions found.
                     </p>
                   </div>
@@ -262,7 +266,7 @@ export default function TransactionsPage() {
                               <TypeIcon
                                 className={`w-5 h-5 ${typeInfo.color}`}
                               />
-                              <h3 className="text-white font-semibold text-base">
+                              <h3 className="text-white font-title font-semibold text-base">
                                 {transaction.description}
                               </h3>
                               <div
@@ -278,7 +282,7 @@ export default function TransactionsPage() {
                                 </span>
                               </div>
                             </div>
-                            <div className="text-sm text-indigo-200 space-y-1">
+                            <div className="text-sm text-indigo-200 space-y-1 font-body">
                               <p>Date: {transaction.date}</p>
                               <p>Method: {transaction.paymentMethod}</p>
                               {transaction.bookingRef && (

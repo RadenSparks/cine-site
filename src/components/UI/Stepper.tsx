@@ -134,13 +134,13 @@ export default function Stepper({
               {currentStep !== 1 && (
                 <button
                   onClick={handleBack}
-                  className={`back-button ${currentStep === 1 ? 'inactive' : ''}`}
+                  className={`back-button font-button ${currentStep === 1 ? 'inactive' : ''}`}
                   {...backButtonProps}
                 >
                   {backButtonText}
                 </button>
               )}
-              <button onClick={isLastStep ? handleComplete : handleNext} className="next-button" {...nextButtonProps}>
+              <button onClick={isLastStep ? handleComplete : handleNext} className="next-button font-button" {...nextButtonProps}>
                 {isLastStep ? 'Complete' : nextButtonText}
               </button>
             </div>

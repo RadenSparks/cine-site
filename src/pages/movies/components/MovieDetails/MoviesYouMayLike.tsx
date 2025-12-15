@@ -2,17 +2,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import type { MovieResponseDTO } from "../../../../types/auth";
 import gsap from "gsap";
 
-interface Movie {
-  id: string;
-  title: string;
-  poster: string;
-  genres?: string[];
-}
-
 interface MoviesYouMayLikeProps {
-  movies: Movie[];
+  movies: MovieResponseDTO[];
 }
 
 export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
@@ -117,7 +111,7 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
     const titleChild = wrapLines(titleRef.current, activeMovie.title);
     const genresChild = wrapLines(
       genresRef.current,
-      activeMovie.genres?.join(" • ") || "Entertainment"
+      activeMovie.genres?.map(g => g.name).join(" • ") || "Entertainment"
     );
 
     const fromY = direction === 1 ? -50 : 50;
@@ -169,11 +163,11 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
       {/* Header */}
       <div className="mb-12 relative z-10">
         <div className="bg-slate-900/70 p-4 rounded-lg border border-purple-400/30 mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-300">
+          <h2 className="text-2xl sm:text-3xl font-title font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-300">
             Movies You May Like
           </h2>
         </div>
-        <p className="text-cyan-200 text-sm sm:text-base font-semibold drop-shadow-lg px-4 relative z-10">
+        <p className="text-cyan-200 text-sm sm:text-base font-body font-semibold drop-shadow-lg px-4 relative z-10">
           Discover more amazing titles based on your interests
         </p>
       </div>
@@ -188,7 +182,7 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
               className="relative w-full h-80 sm:h-96"
               style={{ perspective: "1000px" }}
             >
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 {movies.map((movie, index) => {
                   let offset = index - activeIndex;
                   if (offset > moviesLength / 2) offset -= moviesLength;
@@ -209,7 +203,7 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
                         opacity: offset === 0 ? 1 : 0.5,
                       }}
                       onClick={() => {
-                        navigate(`/movie/${movie.id}`);
+                        navigate(`/movie/${String(movie.id)}`);
                       }}
                     >
                       <img
@@ -230,7 +224,7 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
             <div className="min-h-16">
               <h3
                 ref={titleRef}
-                className="text-3xl sm:text-4xl font-bold text-white leading-tight"
+                className="text-3xl sm:text-4xl font-title font-bold text-white leading-tight"
               >
                 {activeMovie.title}
               </h3>
@@ -240,9 +234,9 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
             <div className="min-h-8">
               <p
                 ref={genresRef}
-                className="text-cyan-300 text-sm sm:text-base font-semibold drop-shadow-md"
+                className="text-cyan-300 text-sm sm:text-base font-semibold drop-shadow-md font-label"
               >
-                {activeMovie.genres?.join(" • ") || "Entertainment"}
+                {activeMovie.genres?.map(g => g.name).join(" • ") || "Entertainment"}
               </p>
             </div>
 
@@ -264,10 +258,10 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
                   key={i}
                   className="bg-gradient-to-br from-slate-900/60 to-slate-800/60 border border-white/10 rounded-lg p-3 backdrop-blur-sm"
                 >
-                  <p className="text-slate-200 text-xs font-semibold drop-shadow-md">
+                  <p className="text-slate-200 text-xs font-semibold drop-shadow-md font-label">
                     {stat.label}
                   </p>
-                  <p className="text-white text-sm font-bold mt-1">{stat.value}</p>
+                  <p className="text-white text-sm font-bold mt-1 font-body">{stat.value}</p>
                 </div>
               ))}
             </motion.div>
@@ -278,7 +272,7 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
               <div className="flex gap-3">
                 <button
                   onClick={handlePrev}
-                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-slate-700/60 hover:bg-slate-600/80 transition-colors text-white text-sm font-medium backdrop-blur-sm border border-white/10"
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-slate-700/60 hover:bg-slate-600/80 transition-colors text-white text-sm font-button font-medium backdrop-blur-sm border border-white/10"
                   onMouseEnter={() => setHoveredArrow("prev")}
                   onMouseLeave={() => setHoveredArrow(null)}
                 >
@@ -295,7 +289,7 @@ export function MoviesYouMayLike({ movies }: MoviesYouMayLikeProps) {
                 </button>
                 <button
                   onClick={handleNext}
-                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-slate-700/60 hover:bg-slate-600/80 transition-colors text-white text-sm font-medium backdrop-blur-sm border border-white/10"
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-slate-700/60 hover:bg-slate-600/80 transition-colors text-white text-sm font-button font-medium backdrop-blur-sm border border-white/10"
                   onMouseEnter={() => setHoveredArrow("next")}
                   onMouseLeave={() => setHoveredArrow(null)}
                 >

@@ -69,7 +69,12 @@ export function UserMenu() {
         {/* Menu Trigger Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="btn flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-600/30 transition-all duration-200 text-white"
+          className="btn flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 text-white font-button text-sm md:text-base font-bold"
+          style={{
+            backgroundColor: "rgba(185, 28, 28, 0.2)",
+            border: "1px solid #ea580c",
+            hover: { backgroundColor: "rgba(234, 88, 12, 0.3)" }
+          }}
           aria-label="User menu"
           aria-expanded={isOpen}
           disabled={isLogoutLoading}
@@ -80,7 +85,7 @@ export function UserMenu() {
             icon={<UserCircleIcon className="h-4 w-4" />}
             className="flex-shrink-0"
           />
-          <span className="text-sm hidden sm:inline truncate max-w-[100px]">
+          <span className="text-sm hidden sm:inline truncate max-w-[100px] font-bold text-white">
             {displayName}
           </span>
           <ChevronDownIcon
@@ -92,7 +97,7 @@ export function UserMenu() {
 
         {/* Dropdown Menu */}
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-xl backdrop-blur-md bg-indigo-950/80 border border-white/20 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+          <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-xl backdrop-blur-md border border-orange-500/30 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2" style={{ backgroundColor: "rgba(2, 6, 23, 0.95)", backgroundImage: "linear-gradient(135deg, rgba(2, 6, 23, 0.9) 0%, rgba(31, 41, 51, 0.85) 100%)" }}>
             {/* Target Cursor for menu items - key changes when menu closes to reset animation */}
             <TargetCursor 
               key={`cursor-${isOpen}`}
@@ -103,14 +108,14 @@ export function UserMenu() {
               parallaxOn={true} 
             />
             {/* User Info Header */}
-            <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-pink-500/10 to-purple-500/10">
-              <p className="text-xs text-indigo-300 font-semibold">Logged in as</p>
-              <p className="text-sm font-bold text-white truncate">{user.email}</p>
+            <div className="px-4 py-3 border-b" style={{ borderColor: "rgba(234, 88, 12, 0.3)", backgroundImage: "linear-gradient(to right, rgba(185, 28, 28, 0.15), rgba(234, 88, 12, 0.1))" }}>
+              <p className="text-xs font-button font-bold text-orange-400">Logged in as</p>
+              <p className="text-sm font-title font-bold text-white truncate">{user.email}</p>
               {user.name && (
-                <p className="text-xs text-indigo-200 mt-1">{user.name}</p>
+                <p className="text-xs font-body text-orange-200/80 mt-1">{user.name}</p>
               )}
               {user.tierPoint !== undefined && (
-                <p className="text-xs text-yellow-300 mt-2 flex items-center gap-1">
+                <p className="text-xs font-button text-orange-300 mt-2 flex items-center gap-1 font-bold">
                   ⭐ {user.tierPoint?.toLocaleString()} points
                 </p>
               )}
@@ -121,41 +126,42 @@ export function UserMenu() {
               <Link
                 to="/account"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-white hover:bg-white/10 transition-colors text-sm"
+                className="flex items-center gap-3 px-4 py-2.5 text-white hover:bg-orange-500/15 transition-colors text-sm font-button font-bold"
               >
-                <UserCircleIcon className="w-4 h-4 flex-shrink-0 text-pink-400" />
+                <UserCircleIcon className="w-4 h-4 flex-shrink-0 text-orange-400" />
                 <span>My Profile</span>
               </Link>
 
               <Link
                 to="/account/bookings"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-white hover:bg-white/10 transition-colors text-sm"
+                className="flex items-center gap-3 px-4 py-2.5 text-white hover:bg-orange-500/15 transition-colors text-sm font-button font-bold"
               >
-                <TicketIcon className="w-4 h-4 flex-shrink-0 text-blue-400" />
+                <TicketIcon className="w-4 h-4 flex-shrink-0 text-orange-400" />
                 <span>My Bookings</span>
               </Link>
 
               <Link
                 to="/account/transactions"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-white hover:bg-white/10 transition-colors text-sm"
+                className="flex items-center gap-3 px-4 py-2.5 text-white hover:bg-orange-500/15 transition-colors text-sm font-button font-bold"
               >
-                <ClipboardDocumentListIcon className="w-4 h-4 flex-shrink-0 text-purple-400" />
+                <ClipboardDocumentListIcon className="w-4 h-4 flex-shrink-0 text-orange-400" />
                 <span>Transactions</span>
               </Link>
             </nav>
 
             {/* Divider */}
-            <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="h-px" style={{ backgroundImage: "linear-gradient(to right, transparent, rgba(234, 88, 12, 0.3), transparent)" }} />
 
             {/* Logout Button */}
             <button
               onClick={handleLogout}
               disabled={isLogoutLoading}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-red-300 hover:bg-red-500/10 transition-colors text-sm font-medium border-t border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-white hover:bg-orange-600/20 transition-colors text-sm font-button font-bold border-t disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ borderColor: "rgba(234, 88, 12, 0.2)" }}
             >
-              <ArrowLeftOnRectangleIcon className="w-4 h-4 flex-shrink-0" />
+              <ArrowLeftOnRectangleIcon className="w-4 h-4 flex-shrink-0 text-orange-400" />
               <span>{isLogoutLoading ? "Logging out..." : "Logout"}</span>
             </button>
           </div>

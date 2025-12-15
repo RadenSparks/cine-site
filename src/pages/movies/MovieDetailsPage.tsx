@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useMovies } from "../../hooks";
+import { useEffect, useState, useMemo } from "react";
+import { usePublicMovies } from "../../hooks";
+import type { MovieResponseDTO } from "../../types/auth";
 import { motion } from "framer-motion";
 import AppNavbar from "../../components/Layout/Navbar";
 import AppFooter from "../../components/Layout/Footer";
@@ -12,33 +13,61 @@ import { MovieGalleryModal } from "./components/MovieDetails/MovieGalleryModal";
 import { MoviesYouMayLike } from "./components/MovieDetails/MoviesYouMayLike";
 import NotFoundPage from "../shared/NotFoundPage";
 
-const galleryImages = [
-  "https://image.tmdb.org/t/p/w342/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg",
-  "https://image.tmdb.org/t/p/w342/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-  "https://image.tmdb.org/t/p/w342/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-  "https://image.tmdb.org/t/p/w342/2CAL2433ZeIihfX1Hb2139CX0pW.jpg",
-  "https://image.tmdb.org/t/p/w342/6bCplVkhowCjTHXWv49UjRPn0eK.jpg",
-  "https://image.tmdb.org/t/p/w342/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-  "https://image.tmdb.org/t/p/w342/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-];
-
 export default function MovieDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const { movies, getMovieById } = useMovies();
-  const movie = getMovieById(id || "");
+  const { fetchMovieById, fetchMovies, movies } = usePublicMovies();
+  const [movie, setMovie] = useState<MovieResponseDTO | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Generate gallery images (using poster as fallback)
+  const galleryImages = movie ? [movie.poster] : [];
+
+  // Fetch all movies on mount for related movies section
+  useEffect(() => {
+    fetchMovies(0, 100); // Fetch up to 100 movies for genre matching
+  }, [fetchMovies]);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setIsLoading(true);
-    const timer = setTimeout(() => {
+    const fetchMovie = async () => {
+      if (id) {
+        const movieData = await fetchMovieById(parseInt(id));
+        setMovie(movieData);
+      }
       setIsLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [id]);
+    };
+    fetchMovie();
+  }, [id, fetchMovieById]);
+
+  // Get related movies based on genre of current movie
+  const relatedMovies = useMemo(() => {
+    if (!movie || !movies || movies.length === 0) return [];
+    
+    const movieGenreIds = movie.genres?.map(g => g.id) || [];
+    if (movieGenreIds.length === 0) return [];
+    
+    // Filter movies that share at least one genre with current movie
+    // Exclude the current movie itself and any deleted movies
+    const related = movies.filter(m => 
+      m.id !== movie.id && 
+      !m.deleted &&
+      m.genres?.some(g => movieGenreIds.includes(g.id))
+    );
+    
+    // Sort by number of matching genres (most relevant first)
+    const sorted = related.sort((a, b) => {
+      const aMatchCount = a.genres?.filter(g => movieGenreIds.includes(g.id)).length || 0;
+      const bMatchCount = b.genres?.filter(g => movieGenreIds.includes(g.id)).length || 0;
+      return bMatchCount - aMatchCount;
+    });
+    
+    // Limit to 6 related movies
+    return sorted.slice(0, 6);
+  }, [movie, movies]);
 
   const handleNextImage = () => {
     setSelectedImageIndex(
@@ -117,17 +146,6 @@ export default function MovieDetailsPage() {
     );
   }
 
-  // Get related movies (same genre)
-  const relatedMovies = movies
-    .filter(
-      (m) =>
-        m.id !== movie.id &&
-        m.genres &&
-        movie.genres &&
-        m.genres.some((genre) => movie.genres!.includes(genre))
-    )
-    .slice(0, 4);
-
   // Main Content
   return (
     <AuroraBackground>
@@ -147,7 +165,7 @@ export default function MovieDetailsPage() {
             setIsModalOpen(true);
           }}
         />
-        <MoviesYouMayLike movies={relatedMovies} />
+        {relatedMovies.length > 0 && <MoviesYouMayLike movies={relatedMovies} />}
       </motion.main>
 
       <MovieGalleryModal

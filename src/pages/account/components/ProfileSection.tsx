@@ -112,10 +112,10 @@ export function ProfileSection({
               </div>
 
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
+                <h1 className="text-2xl sm:text-3xl font-title font-bold text-white drop-shadow-lg">
                   {userData.name}
                 </h1>
-                <p className="text-indigo-100 text-sm sm:text-base break-all">
+                <p className="text-indigo-100 text-sm sm:text-base break-all font-body">
                   {userData.email}
                 </p>
               </div>
@@ -126,13 +126,13 @@ export function ProfileSection({
                 <>
                   <button
                     onClick={onSave}
-                    className="btn flex-1 sm:flex-none px-4 py-2 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-all duration-200 font-semibold text-sm"
+                    className="btn flex-1 sm:flex-none px-4 py-2 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-all duration-200 font-button font-semibold text-sm"
                   >
                     Save All Changes
                   </button>
                   <button
                     onClick={onCancel}
-                    className="btn flex-1 sm:flex-none px-4 py-2 bg-indigo-400/40 text-white rounded-lg hover:bg-indigo-400/60 transition-all duration-200 font-semibold text-sm"
+                    className="btn flex-1 sm:flex-none px-4 py-2 bg-indigo-400/40 text-white rounded-lg hover:bg-indigo-400/60 transition-all duration-200 font-button font-semibold text-sm"
                   >
                     Cancel
                   </button>
@@ -141,14 +141,14 @@ export function ProfileSection({
                 <>
                   <button
                     onClick={onEdit}
-                    className="btn flex-1 sm:flex-none px-4 py-2 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2 font-semibold text-sm"
+                    className="btn flex-1 sm:flex-none px-4 py-2 bg-white text-indigo-600 rounded-lg hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2 font-button font-semibold text-sm"
                   >
                     <PencilIcon className="w-4 h-4" />
                     Edit Profile
                   </button>
                   <button
                     onClick={onLogout}
-                    className="btn flex-1 sm:flex-none px-4 py-2 bg-red-500/40 hover:bg-red-500/60 text-white rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-semibold text-sm"
+                    className="btn flex-1 sm:flex-none px-4 py-2 bg-red-500/40 hover:bg-red-500/60 text-white rounded-lg transition-all duration-200 flex items-center justify-center gap-2 font-button font-semibold text-sm"
                   >
                     <ArrowLeftOnRectangleIcon className="w-4 h-4" />
                     Logout
@@ -164,7 +164,7 @@ export function ProfileSection({
           <div className="space-y-4">
             {/* Profile Fields */}
             <div className="space-y-2">
-              <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-title font-bold text-white flex items-center gap-2">
                 <UserCircleIcon className="w-5 h-5 text-pink-400" />
                 Personal Information
               </h2>
@@ -174,7 +174,7 @@ export function ProfileSection({
               <div className="space-y-6">
                 {/* Profile Section */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-semibold text-indigo-200 uppercase tracking-wider">Profile Information</h3>
+                  <h3 className="text-sm font-label font-semibold text-indigo-200 uppercase tracking-wider">Profile Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FloatingLabelInput
                       label="Full Name"
@@ -207,9 +207,9 @@ export function ProfileSection({
                 <div className="border-t border-slate-700/50 pt-6 space-y-4">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-1 h-6 bg-gradient-to-b from-indigo-400 to-pink-400 rounded"></div>
-                    <h3 className="text-sm font-semibold text-indigo-200 uppercase tracking-wider">Change Password (Optional)</h3>
+                    <h3 className="text-sm font-label font-semibold text-indigo-200 uppercase tracking-wider">Change Password (Optional)</h3>
                   </div>
-                  <p className="text-xs text-slate-400 mb-4">Leave blank to keep your current password</p>
+                  <p className="text-xs text-slate-400 mb-4 font-body">Leave blank to keep your current password</p>
                   
                   {/* Current Password */}
                   <div className="relative">
@@ -289,15 +289,15 @@ export function ProfileSection({
                   {/* Password Error Message */}
                   {passwordError && (
                     <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-                      <p className="text-red-300 text-sm">{passwordError}</p>
+                      <p className="text-red-300 text-sm font-body">{passwordError}</p>
                     </div>
                   )}
 
                   {/* Password Requirements */}
                   {passwordData.newPassword && (
                     <div className="p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
-                      <p className="text-xs text-indigo-300 font-semibold mb-2">Password Requirements:</p>
-                      <ul className="text-xs text-indigo-200 space-y-1">
+                      <p className="text-xs text-indigo-300 font-semibold mb-2 font-label">Password Requirements:</p>
+                      <ul className="text-xs text-indigo-200 space-y-1 font-body">
                         <li>✓ At least 8 characters</li>
                         <li>✓ Contains uppercase and lowercase letters</li>
                         <li>✓ Contains at least one number</li>
@@ -310,26 +310,26 @@ export function ProfileSection({
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
-                  <p className="text-xs text-slate-400 font-semibold">
+                  <p className="text-xs text-slate-400 font-semibold font-label">
                     Full Name
                   </p>
-                  <p className="text-white mt-1">{userData.name}</p>
+                  <p className="text-white mt-1 font-body">{userData.name}</p>
                 </div>
                 <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
-                  <p className="text-xs text-slate-400 font-semibold">
+                  <p className="text-xs text-slate-400 font-semibold font-label">
                     Email
                   </p>
-                  <p className="text-white mt-1 break-all">{userData.email}</p>
+                  <p className="text-white mt-1 break-all font-body">{userData.email}</p>
                 </div>
                 <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
-                  <p className="text-xs text-slate-400 font-semibold">
+                  <p className="text-xs text-slate-400 font-semibold font-label">
                     Phone Number
                   </p>
-                  <p className="text-white mt-1">{userData.phoneNumber}</p>
+                  <p className="text-white mt-1 font-body">{userData.phoneNumber}</p>
                 </div>
                 <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
-                  <p className="text-xs text-slate-400 font-semibold">Tier</p>
-                  <p className="text-white mt-1">{userData.tier}</p>
+                  <p className="text-xs text-slate-400 font-semibold font-label">Tier</p>
+                  <p className="text-white mt-1 font-body">{userData.tier}</p>
                 </div>
               </div>
             )}

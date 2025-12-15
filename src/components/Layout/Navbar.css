@@ -32,19 +32,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.875rem;
+  font-family: "Coustard", serif;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #fff;
-  background: linear-gradient(135deg, #f43f5e 0%, #be185d 100%);
-  border: 2px solid #ec4899;
+  color: #f9fafb;
+  background: linear-gradient(135deg, #b91c1c 0%, #020617 100%);
+  border: 2px solid #ea580c;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
 }
 
 .navbar-logout-btn::before {
@@ -54,7 +55,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #ff006e 0%, #d91e63 100%);
+  background: linear-gradient(135deg, #ea580c 0%, #b91c1c 100%);
   transition: left 0.3s ease;
   z-index: -1;
 }
@@ -65,8 +66,8 @@
 
 .navbar-logout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(244, 63, 94, 0.5);
-  border-color: #ff006e;
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
+  border-color: #ea580c;
 }
 
 .navbar-logout-btn:active {
@@ -88,20 +89,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.875rem;
+  font-family: "Coustard", serif;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #fff;
-  background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
-  border: 2px solid #818cf8;
+  color: #f9fafb;
+  background: linear-gradient(135deg, #1f2933 0%, #020617 100%);
+  border: 2px solid #ea580c;
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
 }
 
 .navbar-login-btn::before {
@@ -111,7 +113,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #a78bfa 0%, #a855f7 100%);
+  background: linear-gradient(135deg, #ea580c 0%, #b91c1c 100%);
   transition: left 0.3s ease;
   z-index: -1;
 }
@@ -122,8 +124,8 @@
 
 .navbar-login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-  border-color: #a78bfa;
+  box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
+  border-color: #ea580c;
 }
 
 .navbar-login-btn:active {

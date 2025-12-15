@@ -45,7 +45,7 @@ const ChronicleButton: React.FC<ChronicleButtonProps> = ({
   const buttonStyle: React.CSSProperties = {
     width,
     borderRadius,
-    fontFamily,
+    fontFamily: fontFamily || 'Coustard',
     background: outlined ? "transparent" : customBackground,
     color: outlined ? customBackground : customForeground,
     padding: padding

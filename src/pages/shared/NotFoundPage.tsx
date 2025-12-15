@@ -69,10 +69,10 @@ export default function NotFoundPage({
             variants={itemVariants}
             className="text-center mb-6"
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+            <h2 className="text-4xl md:text-6xl font-title font-bold text-white mb-4 drop-shadow-lg">
               {title}
             </h2>
-            <p className="text-lg md:text-xl text-slate-100 leading-relaxed max-w-xl mx-auto drop-shadow-md">
+            <p className="text-lg md:text-xl text-slate-100 leading-relaxed max-w-xl mx-auto drop-shadow-md font-body">
               {description}
             </p>
           </motion.div>
@@ -131,10 +131,10 @@ export default function NotFoundPage({
             variants={itemVariants}
             className="mt-12 text-center"
           >
-            <p className="text-slate-200 text-sm md:text-base font-semibold mb-3 drop-shadow-md">
+            <p className="text-slate-200 text-sm md:text-base font-semibold mb-3 drop-shadow-md font-label">
               What you can try:
             </p>
-            <ul className="text-slate-100 text-sm md:text-base space-y-2 max-w-md mx-auto drop-shadow-md">
+            <ul className="text-slate-100 text-sm md:text-base space-y-2 max-w-md mx-auto drop-shadow-md font-body">
               <li>✓ Check the URL for typos</li>
               <li>✓ Browse our complete movie collection</li>
               <li>✓ Use the search feature to find your movie</li>

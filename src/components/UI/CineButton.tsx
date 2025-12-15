@@ -61,7 +61,7 @@ export function CineButton({
           cursor: pointer;
           outline-offset: 4px;
           padding: 0.6rem 1.1rem;
-          font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+          font-family: "Coustard", serif;
           font-size: 0.95rem;
           line-height: 1.2;
           font-weight: 600;

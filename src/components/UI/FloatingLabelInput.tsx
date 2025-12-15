@@ -173,6 +173,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
           padding: var(--input-padding);
           font-size: var(--input-font-size);
           font-weight: 400;
+          font-family: 'Crimson Text', serif;
           color: var(--foreground);
           background: var(--mobile-form-input-bg);
           border: var(--input-outline-width) solid var(--input-outline);
@@ -207,6 +208,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
           color: var(--muted-foreground);
           font-size: var(--label-font-size);
           font-weight: 400;
+          font-family: 'Montserrat Alternates', sans-serif;
           pointer-events: none;
           background: var(--parent-background);
           padding: var(--label-padding);

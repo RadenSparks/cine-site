@@ -71,7 +71,7 @@ export function AccountSidebar() {
         <div className="p-4">
           <button
             onClick={handleLogout}
-            className="btn w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/40 hover:bg-red-500/60 text-white rounded-lg transition-all duration-200 border border-red-400/30 hover:border-red-400/60 font-medium"
+            className="btn w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/40 hover:bg-red-500/60 text-white rounded-lg transition-all duration-200 border border-red-400/30 hover:border-red-400/60 font-button font-medium"
           >
             <ArrowLeftOnRectangleIcon className="w-5 h-5" />
             <span>Logout</span>

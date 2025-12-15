@@ -6,8 +6,8 @@ export default function AppFooter() {
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h6 className="font-bold mb-3">Movies</h6>
-            <ul className="space-y-2 text-sm text-white/80">
+            <h6 className="font-heading font-bold mb-3">Movies</h6>
+            <ul className="space-y-2 text-sm text-white/80 font-body">
               <li><Link to="/movies">Movies</Link></li>
               <li><Link to="/videos">Videos</Link></li>
               <li><Link to="/english">English Movies</Link></li>
@@ -17,8 +17,8 @@ export default function AppFooter() {
           </div>
 
           <div>
-            <h6 className="font-bold mb-3">Information</h6>
-            <ul className="space-y-2 text-sm text-white/80">
+            <h6 className="font-heading font-bold mb-3">Information</h6>
+            <ul className="space-y-2 text-sm text-white/80 font-body">
               <li><Link to="/">Home</Link></li>
               <li><Link to="/about">About</Link></li>
               <li><Link to="/tv">Tv Series</Link></li>
@@ -28,8 +28,8 @@ export default function AppFooter() {
           </div>
 
           <div>
-            <h6 className="font-bold mb-3">Locations</h6>
-            <ul className="space-y-2 text-sm text-white/80">
+            <h6 className="font-heading font-bold mb-3">Locations</h6>
+            <ul className="space-y-2 text-sm text-white/80 font-body">
               <li>Asia</li>
               <li>France</li>
               <li>Taiwan</li>
@@ -39,18 +39,18 @@ export default function AppFooter() {
           </div>
 
           <div>
-            <h6 className="font-bold mb-3">Newsletter</h6>
+            <h6 className="font-heading font-bold mb-3">Newsletter</h6>
             <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
               <input className="flex-1 px-3 py-2 rounded bg-white/5 border border-white/10 text-white placeholder:text-white/60" placeholder="Your Email Address" />
-              <button className="px-3 py-2 rounded bg-pink-500">Send</button>
+              <button className="px-3 py-2 rounded bg-pink-500 font-button">Send</button>
             </form>
-            <p className="text-sm text-white/70 mt-4">Enter your email and receive the latest news, updates and special offers from us.</p>
+            <p className="text-sm font-body text-white/70 mt-4">Enter your email and receive the latest news, updates and special offers from us.</p>
           </div>
         </div>
 
         <div className="border-t border-white/10 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm">&copy; {new Date().getFullYear()} WyvernBox. All rights reserved</p>
-          <div className="flex items-center gap-3 text-white/80">
+          <p className="text-sm font-body">&copy; {new Date().getFullYear()} WyvernBox. All rights reserved</p>
+          <div className="flex items-center gap-3 font-body text-white/80">
             <a aria-label="facebook" href="#facebook" className="hover:underline">Facebook</a>
             <a aria-label="linkedin" href="#linkedin" className="hover:underline">LinkedIn</a>
             <a aria-label="twitter" href="#twitter" className="hover:underline">Twitter</a>

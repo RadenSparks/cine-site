@@ -117,6 +117,9 @@ const CardSwap: React.FC<CardSwapProps> = ({
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Guard: Don't run animation if no cards
+    if (refs.length === 0) return;
+
     const total = refs.length;
     refs.forEach((r, i) => placeNow(r.current!, makeSlot(i, cardDistance, verticalDistance, total), skewAmount));
 
@@ -124,6 +127,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
       if (order.current.length < 2) return;
 
       const [front, ...rest] = order.current;
+      if (!refs[front]) return; // Guard: skip if ref doesn't exist
       const elFront = refs[front].current!;
       const tl = gsap.timeline();
       tlRef.current = tl;
@@ -141,6 +145,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
 
       tl.addLabel('promote', `-=${config.durDrop * config.promoteOverlap}`);
       rest.forEach((idx, i) => {
+        if (!refs[idx]) return; // Skip if ref doesn't exist
         const el = refs[idx].current!;
         const slot = makeSlot(i, cardDistance, verticalDistance, refs.length);
         tl.set(el, { zIndex: slot.zIndex }, 'promote');

@@ -33,7 +33,7 @@ export function SignUpForm({
                               bg-gradient-to-br from-white/6 via-white/4 to-transparent
                               p-6 rounded-2xl border border-white/10 backdrop-blur-sm shadow-xl"
       >
-        <h2 className="text-3xl font-extrabold text-amber-50">Create Account</h2>
+        <h2 className="text-3xl font-title font-extrabold text-amber-50">Create Account</h2>
         <p className="mt-2  text-sl font-semibold text-amber-100/80">
           Register for a new account
         </p>

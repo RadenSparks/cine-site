@@ -104,32 +104,32 @@ export function PaymentStatusModal({
             </motion.div>
 
             {/* Title */}
-            <h2 className="text-2xl font-bold text-white text-center mb-3">
+            <h2 className="text-2xl font-title font-bold text-white text-center mb-3">
               {config.title}
             </h2>
 
             {/* Message */}
-            <p className="text-white text-center mb-6 font-medium drop-shadow-lg">
+            <p className="text-white text-center mb-6 font-body font-medium drop-shadow-lg">
               {config.message}
             </p>
 
             {/* Transaction Details */}
             <div className="bg-black/50 rounded-lg p-4 mb-6 space-y-2 border border-white/10">
               <div className="flex justify-between items-center">
-                <span className="text-slate-100 text-sm font-semibold">Transaction ID:</span>
-                <span className="text-white font-mono text-sm font-bold drop-shadow-md">{transactionId}</span>
+                <span className="text-slate-100 text-sm font-semibold font-label">Transaction ID:</span>
+                <span className="text-white font-mono text-sm font-bold drop-shadow-md font-body">{transactionId}</span>
               </div>
               {amount > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-100 text-sm font-semibold">Amount:</span>
-                  <span className="text-white font-bold text-lg drop-shadow-md">
+                  <span className="text-slate-100 text-sm font-semibold font-label">Amount:</span>
+                  <span className="text-white font-bold text-lg drop-shadow-md font-body">
                     ₹{amount.toFixed(2)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between items-center">
-                <span className="text-slate-100 text-sm font-semibold">Status:</span>
-                <span className={`text-sm font-bold capitalize drop-shadow-md ${config.accentColor}`}>
+                <span className="text-slate-100 text-sm font-semibold font-label">Status:</span>
+                <span className={`text-sm font-bold capitalize drop-shadow-md font-body ${config.accentColor}`}>
                   {status}
                 </span>
               </div>
@@ -168,7 +168,7 @@ export function PaymentStatusModal({
                 </motion.button>
               )}
               {status === 'processing' && (
-                <div className="text-center text-slate-300 text-sm">
+                <div className="text-center text-slate-300 text-sm font-body">
                   Do not close this window...
                 </div>
               )}

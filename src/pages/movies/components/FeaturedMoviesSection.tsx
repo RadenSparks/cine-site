@@ -1,24 +1,16 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { MovieResponseDTO } from '../../../types/auth';
 import CardSwap, { Card } from '../../../components/CardSwap';
 import { MovieGalleryModal } from './MovieDetails/MovieGalleryModal';
 
-interface Movie {
-  id: string;
-  title: string;
-  poster: string;
-  description?: string;
-  genres?: string[];
-  releaseDate?: string;
-  duration?: string;
-}
-
 interface FeaturedMoviesSectionProps {
-  movies: Movie[];
+  movies: MovieResponseDTO[];
+  isLoading?: boolean;
 }
 
 // Memoized CardSwap section to prevent re-renders from parent state changes
-const CardSwapSection = React.memo(({ movies, onSwap }: { movies: Movie[]; onSwap: (index: number) => void }) => (
+const CardSwapSection = React.memo(({ movies, onSwap }: { movies: MovieResponseDTO[]; onSwap: (index: number) => void }) => (
   <div className="lg:col-span-1 flex justify-center" style={{ position: 'relative', pointerEvents: 'none' }}>
     <div className="relative w-full flex justify-center" style={{ minHeight: '480px', pointerEvents: 'none' }}>
       <CardSwap
@@ -34,7 +26,7 @@ const CardSwapSection = React.memo(({ movies, onSwap }: { movies: Movie[]; onSwa
       >
         {movies.map((movie) => (
           <Card
-            key={movie.id}
+            key={String(movie.id)}
             className="cursor-default"
             style={{
               backgroundImage: `url(${movie.poster})`,
@@ -50,27 +42,55 @@ const CardSwapSection = React.memo(({ movies, onSwap }: { movies: Movie[]; onSwa
 
 CardSwapSection.displayName = 'CardSwapSection';
 
-export const FeaturedMoviesSection: React.FC<FeaturedMoviesSectionProps> = ({ movies }) => {
+const FeaturedMoviesSectionComponent: React.FC<FeaturedMoviesSectionProps> = ({ movies, isLoading }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [galleryIndexByMovie, setGalleryIndexByMovie] = useState<Record<string, number>>(
+  const [galleryIndexByMovie, setGalleryIndexByMovie] = useState<Record<string, number>>(() =>
     movies.reduce((acc, movie) => ({ ...acc, [movie.id]: 0 }), {})
   );
 
-  // Generate sample gallery images for each movie (in real app, these would come from the API)
-  const generateGalleryImages = useCallback(() => {
-    const baseImages = [
-      "https://image.tmdb.org/t/p/w342/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg",
-      "https://image.tmdb.org/t/p/w342/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-      "https://image.tmdb.org/t/p/w342/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-      "https://image.tmdb.org/t/p/w342/2CAL2433ZeIihfX1Hb2139CX0pW.jpg",
-    ];
-    return baseImages;
+  // Define callbacks before guard
+  const handleCardSwap = useCallback((cardIndex: number) => {
+    setActiveIndex(cardIndex);
   }, []);
 
-  const activeMovie = movies[activeIndex];
-  const galleryImages = generateGalleryImages();
-  const selectedGalleryIndex = galleryIndexByMovie[activeMovie.id] || 0;
+  // Guard: Return skeleton if no movies or still loading
+  if (isLoading || movies.length === 0) {
+    return (
+      <div className="w-full">
+        {/* Header */}
+        <div className="mb-8">
+          <h2 className="text-2xl md:text-4xl font-title font-bold text-white mb-2">
+            Featured Movies
+          </h2>
+          <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
+        </div>
+
+        {/* Skeleton Loading */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Left - Details Skeleton */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="h-8 bg-slate-800 rounded animate-pulse"></div>
+            <div className="h-40 bg-slate-800 rounded-lg animate-pulse"></div>
+            <div className="h-64 bg-slate-800 rounded-lg animate-pulse"></div>
+          </div>
+
+          {/* Right - CardSwap Skeleton */}
+          <div className="lg:col-span-1 flex justify-center">
+            <div className="w-full h-96 bg-slate-800 rounded-lg animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Ensure activeIndex is within bounds
+  const boundedActiveIndex = Math.min(activeIndex, movies.length - 1);
+  const activeMovie = movies[boundedActiveIndex];
+  
+  // Use movie poster as gallery image (can be extended with multiple images if API provides them)
+  const galleryImages = activeMovie ? [activeMovie.poster] : [];
+  const selectedGalleryIndex = activeMovie ? (galleryIndexByMovie[activeMovie.id] || 0) : 0;
 
   const handleGallerySelect = (idx: number) => {
     setGalleryIndexByMovie(prev => ({
@@ -80,24 +100,18 @@ export const FeaturedMoviesSection: React.FC<FeaturedMoviesSectionProps> = ({ mo
   };
 
   const handleNextGalleryImage = () => {
-    handleGallerySelect((selectedGalleryIndex + 1) % galleryImages.length);
+    handleGallerySelect((selectedGalleryIndex + 1) % (galleryImages.length || 1));
   };
 
   const handlePrevGalleryImage = () => {
-    handleGallerySelect((selectedGalleryIndex - 1 + galleryImages.length) % galleryImages.length);
+    handleGallerySelect((selectedGalleryIndex - 1 + (galleryImages.length || 1)) % (galleryImages.length || 1));
   };
-
-  const handleCardSwap = useCallback((cardIndex: number) => {
-    setActiveIndex(cardIndex);
-  }, []);
-
-  if (movies.length === 0) return null;
 
   return (
     <div className="w-full">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl md:text-4xl font-bold text-white mb-2">
+        <h2 className="text-2xl md:text-4xl font-title font-bold text-white mb-2">
           Featured Movies
         </h2>
         <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
@@ -118,12 +132,12 @@ export const FeaturedMoviesSection: React.FC<FeaturedMoviesSectionProps> = ({ mo
           >
             {/* Title */}
             <div>
-              <h3 className="text-xl md:text-2xl font-bold text-white mb-1">
+              <h3 className="text-xl md:text-2xl font-title font-bold text-white mb-1">
                 {activeMovie.title}
               </h3>
-              <p className="text-amber-400 text-xs md:text-sm font-semibold drop-shadow-lg">
-                {activeMovie.releaseDate && `${new Date(activeMovie.releaseDate).getFullYear()}`}
-                {activeMovie.duration && ` • ${activeMovie.duration}`}
+              <p className="text-amber-400 text-xs md:text-sm font-semibold drop-shadow-lg font-label">
+                {activeMovie.premiereDate && `${new Date(activeMovie.premiereDate).getFullYear()}`}
+                {activeMovie.duration && ` • ${Math.floor(activeMovie.duration / 60)}h ${activeMovie.duration % 60}m`}
               </p>
             </div>
 
@@ -132,10 +146,10 @@ export const FeaturedMoviesSection: React.FC<FeaturedMoviesSectionProps> = ({ mo
               <div className="flex flex-wrap gap-1.5">
                 {activeMovie.genres.slice(0, 2).map((genre) => (
                   <span
-                    key={genre}
-                    className="px-2 py-0.5 bg-blue-600/30 border border-blue-400/50 text-blue-200 rounded-full text-xs font-medium"
+                    key={String(genre.id)}
+                    className="px-2 py-0.5 bg-blue-600/30 border border-blue-400/50 text-blue-200 rounded-full text-xs font-medium font-label"
                   >
-                    {genre}
+                    {genre.name}
                   </span>
                 ))}
               </div>
@@ -144,7 +158,7 @@ export const FeaturedMoviesSection: React.FC<FeaturedMoviesSectionProps> = ({ mo
 
           {/* Gallery Reel */}
           <div className="space-y-2">
-            <p className="text-slate-300 text-xs font-semibold">Gallery</p>
+            <p className="text-slate-300 text-xs font-semibold font-label">Gallery</p>
             <AnimatePresence mode="wait">
               <motion.div
                 key={`gallery-${activeIndex}`}
@@ -216,8 +230,8 @@ export const FeaturedMoviesSection: React.FC<FeaturedMoviesSectionProps> = ({ mo
                 transition={{ delay: idx * 0.05 }}
                 className="p-2 rounded-lg bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50"
               >
-                <p className="text-xs text-slate-400 font-medium">{stat.label}</p>
-                <p className="text-sm font-bold text-white mt-0.5">{stat.value}</p>
+                <p className="text-xs text-slate-400 font-medium font-label">{stat.label}</p>
+                <p className="text-sm font-bold text-white mt-0.5 font-body">{stat.value}</p>
               </motion.div>
             ))}
           </div>
@@ -261,5 +275,7 @@ export const FeaturedMoviesSection: React.FC<FeaturedMoviesSectionProps> = ({ mo
     </div>
   );
 };
+
+export const FeaturedMoviesSection = React.memo(FeaturedMoviesSectionComponent);
 
 export default FeaturedMoviesSection;

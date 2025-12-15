@@ -510,14 +510,14 @@ export default function AuthPage() {
               <div className="text-center text-black/90">
                 {isSignUp ? (
                   <>
-                    <h3 className="text-3xl font-bold mb-2">Welcome Back!</h3>
-                    <p className="mb-6 text-black/70">Already have an account? Sign in to continue your journey.</p>
+                    <h3 className="text-3xl font-title font-bold mb-2">Welcome Back!</h3>
+                    <p className="mb-6 text-black/70 font-body">Already have an account? Sign in to continue your journey.</p>
                     <CineButton onClick={() => setIsSignUp(false)} className="bg-white/90">Sign In</CineButton>
                   </>
                 ) : (
                   <>
-                    <h3 className="text-3xl font-bold mb-2">Hello, Friend!</h3>
-                    <p className="mb-6 text-black/70">Register and book your tickets now!!!</p>
+                    <h3 className="text-3xl font-title font-bold mb-2">Hello, Friend!</h3>
+                    <p className="mb-6 text-black/70 font-body">Register and book your tickets now!!!</p>
                     <CineButton onClick={() => setIsSignUp(true)} className="bg-white/90">Sign Up</CineButton>
                   </>
                 )}
@@ -529,7 +529,7 @@ export default function AuthPage() {
           <div className="absolute bottom-4 left-0 right-0 text-center md:hidden">
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-pink-300 hover:text-pink-200"
+              className="text-sm text-pink-300 hover:text-pink-200 font-body"
             >
               {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
             </button>

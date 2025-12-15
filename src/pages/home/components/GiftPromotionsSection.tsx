@@ -1,4 +1,5 @@
 import { CineButton } from "../../../components/UI/CineButton";
+import MagicText from "../../../components/UI/MagicText";
 import { cn } from "../../../lib/utils";
 
 export const BentoGrid = ({
@@ -42,10 +43,10 @@ export const BentoGridItem = ({
     {header}
     <div className="flex-1 flex flex-col justify-between">
       {icon}
-      <div className="mt-2 mb-2 font-sans font-bold text-white text-2xl">
+      <div className="mt-2 mb-2 font-title font-bold text-white text-2xl">
         {title}
       </div>
-      <div className="font-sans text-base font-normal text-pink-100 mb-4">
+      <div className="font-body text-base font-normal text-pink-100 mb-4">
         {description}
       </div>
       {action && <div>{action}</div>}
@@ -56,7 +57,7 @@ export const BentoGridItem = ({
 export default function GiftPromotionsSection() {
   return (
     <div className="mb-12">
-      <h2 className="text-xl font-bold mb-8 text-white">Gift & Promotions</h2>
+      <MagicText gradientColors={["#fff", "#e5e7eb", "#f3f4f6", "#d1d5db"]} starColors={["#fff", "#e5e7eb", "#f3f4f6", "#d1d5db"]} starCount={4} gradientSpeed="2.5s" sparkleFrequency={1200} starSize="clamp(18px,2vw,32px)" className="text-3xl sm:text-4xl md:text-5xl font-title font-extrabold leading-tight mb-8 block">Gift & Promotions</MagicText>
       <BentoGrid>
         <BentoGridItem
           title="Gift Cards"

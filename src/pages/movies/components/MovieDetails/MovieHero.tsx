@@ -3,36 +3,73 @@ import { useNavigate } from "react-router-dom";
 import Shuffle from "../../../../components/UI/Shuffle";
 import Countdown from "../../../../components/Countdown";
 import { CineButton } from "../../../../components/UI/CineButton";
+import type { MovieResponseDTO } from "../../../../types/auth";
 import {
   CalendarIcon,
   ClockIcon,
   FilmIcon,
   StarIcon,
+  PlayIcon,
 } from "@heroicons/react/24/outline";
 
 interface MovieHeroProps {
-  movie: {
-    id: string;
-    title: string;
-    poster: string;
-    description?: string;
-    releaseDate?: string;
-    genres?: string[];
-    duration?: string;
-    imdbRating?: number;
-  };
+  movie: MovieResponseDTO;
   onWishlistClick?: () => void;
+}
+
+/**
+ * Convert various video URL formats to embeddable iframe src
+ */
+function getEmbeddableUrl(url: string): { embedUrl: string; isEmbeddable: boolean } {
+  if (!url) return { embedUrl: "", isEmbeddable: false };
+
+  // YouTube URL patterns
+  const youtubePatterns = [
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([^&]+)/,
+    /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?]+)/,
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?]+)/,
+  ];
+
+  for (const pattern of youtubePatterns) {
+    const match = url.match(pattern);
+    if (match) {
+      return {
+        embedUrl: `https://www.youtube.com/embed/${match[1]}`,
+        isEmbeddable: true,
+      };
+    }
+  }
+
+  // Vimeo URL patterns
+  const vimeoPattern = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/;
+  const vimeoMatch = url.match(vimeoPattern);
+  if (vimeoMatch) {
+    return {
+      embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
+      isEmbeddable: true,
+    };
+  }
+
+  // Check if URL is already an embed URL
+  if (url.includes("youtube.com/embed") || url.includes("player.vimeo.com")) {
+    return { embedUrl: url, isEmbeddable: true };
+  }
+
+  // For other URLs, we'll open in new tab instead of embedding
+  return { embedUrl: url, isEmbeddable: false };
 }
 
 export function MovieHero({ movie, onWishlistClick }: MovieHeroProps) {
   const navigate = useNavigate();
 
-  const releaseDate = new Date(movie.releaseDate || "");
+  const releaseDate = new Date(movie.premiereDate || "");
   const formattedDate = releaseDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+
+  const { embedUrl, isEmbeddable } = getEmbeddableUrl(movie.teaser || "");
 
   return (
     <motion.div
@@ -74,10 +111,10 @@ export function MovieHero({ movie, onWishlistClick }: MovieHeroProps) {
         <div className="flex flex-wrap gap-2 items-center w-full mb-6">
           {movie.genres?.map((genre) => (
             <span
-              key={genre}
+              key={String(genre.id)}
               className="px-4 py-2 bg-slate-900/80 border border-cyan-400/50 text-white font-semibold rounded-full backdrop-blur-md hover:bg-slate-900 transition-all"
             >
-              {genre}
+              {genre.name}
             </span>
           ))}
           <div className="ml-auto">
@@ -100,16 +137,40 @@ export function MovieHero({ movie, onWishlistClick }: MovieHeroProps) {
           className="mb-6 rounded-lg overflow-hidden"
         >
           <div className="relative w-full bg-black" style={{ aspectRatio: "16/9", height: "300px" }}>
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-              title="Movie Trailer"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
+            {movie.teaser && isEmbeddable ? (
+              <iframe
+                width="100%"
+                height="100%"
+                src={embedUrl}
+                title={`${movie.title} - Teaser`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            ) : movie.teaser && !isEmbeddable ? (
+              <a
+                href={movie.teaser}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 transition-all group"
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-blue-600 group-hover:bg-blue-700 flex items-center justify-center mx-auto mb-3 transition-colors">
+                    <PlayIcon className="w-8 h-8 text-white ml-1" />
+                  </div>
+                  <p className="text-white font-semibold group-hover:text-blue-300 transition-colors">Watch Teaser</p>
+                  <p className="text-slate-400 text-sm mt-1 font-body">Opens in new window</p>
+                </div>
+              </a>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                <div className="text-center">
+                  <FilmIcon className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                  <p className="text-slate-400 font-medium">No teaser available</p>
+                </div>
+              </div>
+            )}
             <div className="absolute inset-0 ring-1 ring-white/10 rounded-lg pointer-events-none"></div>
           </div>
         </motion.div>
@@ -118,43 +179,43 @@ export function MovieHero({ movie, onWishlistClick }: MovieHeroProps) {
         <div className="grid grid-cols-2 gap-4 mb-8">
           {/* Release Date */}
           <div className="bg-slate-900/70 border border-cyan-400/30 rounded-lg p-4 backdrop-blur-md">
-            <div className="flex items-center gap-2 text-cyan-300 text-sm mb-2 font-medium">
+            <div className="flex items-center gap-2 text-cyan-300 text-sm mb-2 font-medium font-label">
               <CalendarIcon className="w-4 h-4" />
               Release Date
             </div>
-            <p className="text-white font-bold text-lg">{formattedDate}</p>
+            <p className="text-white font-bold text-lg font-body">{formattedDate}</p>
           </div>
 
           {/* Duration */}
           {movie.duration && (
             <div className="bg-slate-900/70 border border-purple-400/30 rounded-lg p-4 backdrop-blur-md">
-              <div className="flex items-center gap-2 text-purple-300 text-sm mb-2 font-medium">
+              <div className="flex items-center gap-2 text-purple-300 text-sm mb-2 font-medium font-label">
                 <ClockIcon className="w-4 h-4" />
                 Duration
               </div>
-              <p className="text-white font-bold text-lg">{movie.duration}</p>
+              <p className="text-white font-bold text-lg font-body">{Math.floor(movie.duration / 60)}h {movie.duration % 60}m</p>
             </div>
           )}
 
           {/* Rating */}
           {movie.duration && (
             <div className="bg-slate-900/70 border border-pink-400/30 rounded-lg p-4 backdrop-blur-md">
-              <div className="flex items-center gap-2 text-pink-300 text-sm mb-2 font-medium">
+              <div className="flex items-center gap-2 text-pink-300 text-sm mb-2 font-medium font-label">
                 <FilmIcon className="w-4 h-4" />
                 Rating
               </div>
-              <p className="text-white font-bold text-lg">PG-13</p>
+              <p className="text-white font-bold text-lg font-body">PG-13</p>
             </div>
           )}
 
           {/* IMDb Rating */}
           <div className="bg-slate-900/70 border border-yellow-400/30 rounded-lg p-4 backdrop-blur-md">
-            <div className="flex items-center gap-2 text-yellow-300 text-sm mb-2 font-medium">
+            <div className="flex items-center gap-2 text-yellow-300 text-sm mb-2 font-medium font-label">
               <StarIcon className="w-4 h-4" />
               IMDb Rating
             </div>
-            <p className="text-white font-bold text-lg">
-              {(movie.imdbRating ?? 0).toFixed(1)}/10
+            <p className="text-white font-bold text-lg font-body">
+              {(movie.rating ?? 0).toFixed(1)}/10
             </p>
           </div>
         </div>
@@ -162,7 +223,7 @@ export function MovieHero({ movie, onWishlistClick }: MovieHeroProps) {
         {/* Action Buttons */}
         <div className="flex gap-4">
           <CineButton
-            onClick={() => navigate(`/booking/${movie.id}`)}
+            onClick={() => navigate(`/booking/${String(movie.id)}`, { state: { movie } })}
             className="flex-1 justify-center"
           >
             Book Tickets

@@ -107,13 +107,17 @@ export default function BookingsPage() {
 
   return (
     <motion.div
-      className="min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-pink-900 px-4 sm:px-6 lg:px-8 pt-16 pb-8"
+      className="min-h-screen px-4 sm:px-6 lg:px-8 pt-16 pb-8"
+      style={{
+        backgroundImage: "radial-gradient(ellipse 150% 100% at 50% 0%, #f28b6b 0%, #b14f4a 25%, #5a314b 50%, #221824 100%)",
+        backgroundAttachment: "fixed",
+      }}
     >
       <TargetCursor targetSelector="button, a[role='button'], [role='button'], .btn, .button, [class*='btn'], [class*='button'], .shiny-cta, .shiny-cta-link, .cursor-target" spinDuration={2} hideDefaultCursor={true} hoverDuration={0.2} parallaxOn={true} />
-      {/* Animated background elements */}
+      {/* Animated background elements - glowing embers */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-red-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ backgroundImage: "linear-gradient(to bottom right, rgba(242, 139, 107, 0.4), rgba(177, 79, 74, 0.4))" }}></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000" style={{ backgroundImage: "linear-gradient(to bottom right, rgba(177, 79, 74, 0.4), rgba(90, 49, 75, 0.4))" }}></div>
       </div>
 
       <div className="relative w-full mx-auto">
@@ -135,11 +139,11 @@ export default function BookingsPage() {
               transition={{ duration: 0.5 }}
             >
               {/* Header */}
-              <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-6 py-8">
+              <div className="relative px-6 py-8" style={{ backgroundImage: "linear-gradient(to right, #5a314b, #b14f4a, #f28b6b)" }}>
                 <div className="absolute inset-0 bg-black/10"></div>
                 <div className="relative flex items-center gap-3">
                   <TicketIcon className="w-8 h-8 text-white" />
-                  <h1 className="text-3xl font-bold text-white">My Bookings</h1>
+                  <h1 className="text-3xl font-title font-bold text-white">My Bookings</h1>
                 </div>
               </div>
 
@@ -148,7 +152,7 @@ export default function BookingsPage() {
                 {bookings.length === 0 ? (
                   <div className="text-center py-12">
                     <TicketIcon className="w-16 h-16 text-indigo-300 mx-auto mb-4 opacity-50" />
-                    <p className="text-indigo-100 text-lg">
+                    <p className="text-indigo-100 text-lg font-body">
                       No bookings found. Start booking your favorite movies!
                     </p>
                   </div>
@@ -171,7 +175,7 @@ export default function BookingsPage() {
                           {/* Movie Info */}
                           <div className="flex-1">
                             <div className="flex items-start gap-3 mb-4">
-                              <h3 className="text-xl font-bold text-white">
+                              <h3 className="text-xl font-title font-bold text-white">
                                 {booking.movieTitle}
                               </h3>
                               <div
@@ -189,7 +193,7 @@ export default function BookingsPage() {
                             </div>
 
                             {/* Details Grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-body">
                               <div className="flex items-center gap-2 text-indigo-100">
                                 <CalendarIcon className="w-4 h-4 flex-shrink-0 text-pink-400" />
                                 <span>{booking.date}</span>
@@ -212,7 +216,7 @@ export default function BookingsPage() {
                           {/* Price & Booking ID */}
                           <div className="flex flex-col items-end gap-4 border-t sm:border-t-0 sm:border-l border-white/20 pt-4 sm:pt-0 sm:pl-4">
                             <div className="text-right">
-                              <p className="text-indigo-100 text-xs mb-1">
+                              <p className="text-indigo-100 text-xs mb-1 font-label">
                                 Total Price
                               </p>
                               <p className="text-2xl font-bold text-pink-300">
@@ -220,14 +224,14 @@ export default function BookingsPage() {
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-indigo-100 text-xs mb-1">
+                              <p className="text-indigo-100 text-xs mb-1 font-label">
                                 Booking ID
                               </p>
-                              <p className="text-sm font-mono text-white">
+                              <p className="text-sm font-mono text-white font-body">
                                 {booking.id}
                               </p>
                             </div>
-                            <p className="text-xs text-indigo-200">
+                            <p className="text-xs text-indigo-200 font-body">
                               Booked on {booking.bookingDate}
                             </p>
                           </div>

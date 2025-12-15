@@ -252,6 +252,8 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
 
     window.addEventListener('mouseover', enterHandler as EventListener);
 
+    const activeStrength = activeStrengthRef.current;
+
     return () => {
       // Kill all GSAP animations and timelines
       if (tickerFnRef.current) {
@@ -291,7 +293,7 @@ const TargetCursor: React.FC<TargetCursorProps> = ({
       document.body.style.cursor = originalCursor;
       isActiveRef.current = false;
       targetCornerPositionsRef.current = null;
-      activeStrengthRef.current.value = 0;
+      activeStrength.value = 0;
     };
   }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor, isMobile, hoverDuration, parallaxOn]);
 

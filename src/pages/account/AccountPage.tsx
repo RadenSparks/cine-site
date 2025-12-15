@@ -235,11 +235,15 @@ export default function AccountPage() {
       <TargetCursor targetSelector="button, a[role='button'], [role='button'], .btn, .button, [class*='btn'], [class*='button'], .shiny-cta, .shiny-cta-link, .cursor-target" spinDuration={2} hideDefaultCursor={true} hoverDuration={0.2} parallaxOn={true} />
       <SplashedPushNotifications ref={notificationRef} />
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-pink-900 px-4 sm:px-6 lg:px-8 pt-16 pb-4"
+        className="min-h-screen px-4 sm:px-6 lg:px-8 pt-16 pb-4"
+        style={{
+          backgroundImage: "linear-gradient(135deg, #221824 0%, #5a314b 30%, #b14f4a 60%, #f28b6b 100%)",
+          backgroundAttachment: "fixed",
+        }}
       >
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-red-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
+          <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ backgroundImage: "linear-gradient(to bottom right, rgba(242, 139, 107, 0.4), rgba(177, 79, 74, 0.4))" }}></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000" style={{ backgroundImage: "linear-gradient(to bottom right, rgba(177, 79, 74, 0.4), rgba(90, 49, 75, 0.4))" }}></div>
         </div>
 
         <div className="relative w-full mx-auto">
@@ -268,7 +272,7 @@ export default function AccountPage() {
 
               <div className="mt-6 space-y-4">
                 <div className="space-y-2">
-                  <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2 mb-6">
+                  <h2 className="text-base sm:text-lg font-title font-bold text-white flex items-center gap-2 mb-6">
                     <StarIcon className="w-5 h-5 text-yellow-400" />
                     Membership & Rewards
                   </h2>
@@ -288,8 +292,8 @@ export default function AccountPage() {
                       <div className="relative z-10">
                         <div className="flex items-start justify-between mb-4">
                           <div>
-                            <p className="text-purple-300 text-sm font-semibold tracking-widest mb-1">REWARD BALANCE</p>
-                            <h3 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+                            <p className="text-purple-300 text-sm font-label font-semibold tracking-widest mb-1">REWARD BALANCE</p>
+                            <h3 className="text-3xl md:text-4xl font-title font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
                               {userData?.tierPoint.toLocaleString()}
                             </h3>
                           </div>
@@ -298,7 +302,7 @@ export default function AccountPage() {
                           </div>
                         </div>
 
-                        <p className="text-indigo-200 text-sm mb-6 leading-relaxed">
+                        <p className="text-indigo-200 text-sm mb-6 leading-relaxed font-body">
                           Use your points to unlock exclusive discounts, early access, and special perks.
                         </p>
 
@@ -325,8 +329,8 @@ export default function AccountPage() {
                       <div className="relative z-10">
                         <div className="flex items-start justify-between mb-4">
                           <div>
-                            <p className="text-pink-300 text-sm font-semibold tracking-widest mb-1">MEMBERSHIP TIER</p>
-                            <h3 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-rose-300">
+                            <p className="text-pink-300 text-sm font-label font-semibold tracking-widest mb-1">MEMBERSHIP TIER</p>
+                            <h3 className="text-3xl md:text-4xl font-title font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-rose-300">
                               {userData?.tier}
                             </h3>
                           </div>
@@ -335,7 +339,7 @@ export default function AccountPage() {
                           </div>
                         </div>
 
-                        <p className="text-rose-200 text-sm mb-6 leading-relaxed">
+                        <p className="text-rose-200 text-sm mb-6 leading-relaxed font-body">
                           Unlock premium benefits and earn 2x points on every booking.
                         </p>
 
@@ -357,26 +361,26 @@ export default function AccountPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                   >
-                    <h3 className="text-white font-bold mb-4 text-sm flex items-center gap-2">
+                    <h3 className="text-white font-title font-bold mb-4 text-sm flex items-center gap-2">
                       <span className="text-lg">✨</span>
                       Your {userData?.tier} Tier Benefits
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                         <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex-shrink-0 mt-1.5"></div>
-                        <span className="text-xs text-indigo-100">10% discount on all movie bookings</span>
+                        <span className="text-xs text-indigo-100 font-body">10% discount on all movie bookings</span>
                       </div>
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                         <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex-shrink-0 mt-1.5"></div>
-                        <span className="text-xs text-indigo-100">Early access to exclusive screenings and premieres</span>
+                        <span className="text-xs text-indigo-100 font-body">Early access to exclusive screenings and premieres</span>
                       </div>
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                         <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex-shrink-0 mt-1.5"></div>
-                        <span className="text-xs text-indigo-100">Priority customer support (24/7)</span>
+                        <span className="text-xs text-indigo-100 font-body">Priority customer support (24/7)</span>
                       </div>
                       <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
                         <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full flex-shrink-0 mt-1.5"></div>
-                        <span className="text-xs text-indigo-100">Earn 2x points on every booking</span>
+                        <span className="text-xs text-indigo-100 font-body">Earn 2x points on every booking</span>
                       </div>
                     </div>
                   </motion.div>

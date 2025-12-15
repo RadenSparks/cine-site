@@ -159,7 +159,7 @@ export default function Countdown({ targetDate, fontSize }: { targetDate?: strin
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sl text-white/90">Next showing in</span>
+      <span className="text-sl font-label text-white/90">Next showing in</span>
       <Counter value={packed} fontSize={fontSize ?? 26} padding={6} />
     </div>
   );

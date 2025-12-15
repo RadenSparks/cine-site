@@ -25,6 +25,15 @@ export function MidSlider({ items = [], autoplayInterval = 5000, isLoading = fal
   const [isTrailerModalOpen, setIsTrailerModalOpen] = useState(false);
   const [selectedTrailerIndex, setSelectedTrailerIndex] = useState(0);
 
+  // Only reset index if items array is truly empty (initial load), NOT on every filter change
+  useEffect(() => {
+    // Only reset if we go from having items to having NO items
+    if (!isLoading && (!items || items.length === 0)) {
+      setActiveIndex(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]);
+
   useEffect(() => {
     if (!isAutoplay || !items || items.length === 0 || isLoading) return;
 
@@ -33,7 +42,8 @@ export function MidSlider({ items = [], autoplayInterval = 5000, isLoading = fal
     }, autoplayInterval);
 
     return () => clearInterval(timer);
-  }, [isAutoplay, items, autoplayInterval, isLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoplay, items.length, autoplayInterval, isLoading]);
 
   // Show skeleton loading if isLoading is true or items is empty
   if (isLoading || !items || items.length === 0) {
@@ -100,17 +110,17 @@ export function MidSlider({ items = [], autoplayInterval = 5000, isLoading = fal
                 <div className="container mx-auto px-4 md:px-6 lg:px-12 max-w-3xl">
                   <div className="text-white max-w-2xl">
                     {/* Genre Label */}
-                    <span className="inline-block text-xs md:text-sm font-bold bg-blue-600 px-3 md:px-4 py-1 rounded-full mb-2 md:mb-4">
+                    <span className="inline-block text-xs md:text-sm font-button font-bold bg-orange-600 px-3 md:px-4 py-1 rounded-full mb-2 md:mb-4">
                       {item.genre}
                     </span>
 
                     {/* Title */}
-                    <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold leading-tight line-clamp-3 mb-2 md:mb-4">
+                    <h2 className="text-2xl md:text-4xl lg:text-5xl font-title font-extrabold leading-tight line-clamp-3 mb-2 md:mb-4">
                       {item.title}
                     </h2>
 
                     {/* Metadata */}
-                    <p className="text-gray-300 text-sm md:text-lg line-clamp-1 mb-4 md:mb-6">{item.metadata}</p>
+                    <p className="text-gray-300 text-sm md:text-lg line-clamp-1 mb-4 md:mb-6 font-body">{item.metadata}</p>
                   </div>
                 </div>
 
@@ -120,7 +130,7 @@ export function MidSlider({ items = [], autoplayInterval = 5000, isLoading = fal
                     setSelectedTrailerIndex(index);
                     setIsTrailerModalOpen(true);
                   }}
-                  className="cursor-target btn absolute bottom-8 left-4 md:bottom-10 md:left-12 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 group text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="cursor-target btn absolute bottom-8 left-4 md:bottom-10 md:left-12 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-button font-bold py-2 px-6 rounded-lg transition-colors duration-200 group text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <Play size={20} className="flex-shrink-0 group-hover:scale-110 transition-transform" />
                   <span>Watch Trailer</span> 

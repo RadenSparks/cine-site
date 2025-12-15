@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 import AppNavbar from '../../components/Layout/Navbar';
 import AppFooter from '../../components/Layout/Footer';
@@ -10,6 +11,7 @@ import GiftPromotionsSection from './components/GiftPromotionsSection';
 import ComingSoonSection from './components/ComingSoonSection';
 import { CineCardsCarousel } from '../../components/UI/CineCardsCarousel';
 import { AuroraBackground } from "../../components/Layout/AuroraBackground";
+import { usePublicMovies } from '../../hooks';
 
 const newsCards = [
   {
@@ -39,6 +41,13 @@ const newsCards = [
 ];
 
 export default function HomePage() {
+  // Fetch movies from public API
+  const { movies, isLoading, fetchMovies } = usePublicMovies();
+
+  // Fetch movies on mount
+  useEffect(() => {
+    fetchMovies(0, 20); // Fetch 20 movies for home page sections
+  }, [fetchMovies]);
 
   return (
     <AuroraBackground>
@@ -49,12 +58,12 @@ export default function HomePage() {
         transition={{ delay: 0.2, duration: 0.8, ease: "easeInOut" }}
         className="flex-1 container mx-auto px-4"
       >
-        <HeroSlider />
-        <HotMoviesSection />
-        <NowShowingSection />
-        <ComingSoonSection /> 
+        <HeroSlider movies={movies.slice(0, 4)} isLoading={isLoading} />
+        <HotMoviesSection movies={movies} isLoading={isLoading} />
+        <NowShowingSection movies={movies} isLoading={isLoading} />
+        <ComingSoonSection movies={movies} isLoading={isLoading} /> 
         <CineCardsCarousel cards={newsCards} />
-        <HotTrailerSection />
+        <HotTrailerSection movies={movies} isLoading={isLoading} />
         <GiftPromotionsSection />
       </motion.main>
       <AppFooter />

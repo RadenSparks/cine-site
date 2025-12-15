@@ -129,13 +129,13 @@ export function CineCard(props: CineCardProps) {
 															{genres?.map((genre) => (
 																<span
 																	key={genre}
-																	className="bg-pink-700/80 text-xs text-white px-2 py-1 rounded-full shadow"
+																	className="bg-pink-700/80 text-xs text-white px-2 py-1 rounded-full shadow font-label"
 																>
 																	{genre}
 																</span>
 															))}
 														</div>
-														<span className="inline-block px-4 py-2 rounded-xl shadow-lg border-2 border-blue-950 bg-gradient-to-r from-blue-950 via-indigo-900 to-blue-900 text-amber-200 font-extrabold text-base tracking-wide">
+														<span className="inline-block px-4 py-2 rounded-xl shadow-lg border-2 border-blue-950 bg-gradient-to-r from-blue-950 via-indigo-900 to-blue-900 text-amber-200 font-label font-extrabold text-base tracking-wide">
 															{title}
 														</span>
 													</motion.div>
@@ -152,12 +152,12 @@ export function CineCard(props: CineCardProps) {
 														exit={{ opacity: 0 }}
 													>
 														{description && (
-															<div className="text-white text-sm mb-2 line-clamp-3">
+															<div className="text-white text-sm font-body mb-2 line-clamp-3">
 																{description}
 															</div>
 														)}
 														{releaseDate && (
-															<div className="text-amber-200 text-base mb-3 font-bold">
+															<div className="text-amber-200 text-base font-label mb-3 font-bold">
 																Release: {releaseDate}
 															</div>
 														)}

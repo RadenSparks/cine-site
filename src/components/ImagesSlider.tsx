@@ -84,7 +84,7 @@ export const ImagesSlider = ({
     visible: {
       scale: 1,
       opacity: 1,
-      transition: { duration: 0.6, ease: [0.215, 0.61, 0.355, 1] },
+      transition: { duration: 0.6 },
     },
     upExit: { opacity: 0, y: "-12%", transition: { duration: 0.7 } },
     downExit: { opacity: 0, y: "12%", transition: { duration: 0.7 } },
