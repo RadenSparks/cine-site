@@ -2,7 +2,7 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useState, useCallback, useEffect } from 'react';
 import { useBookings } from '../../hooks';
 import { usePublicMovies } from '../../hooks';
-import type { MovieResponseDTO } from '../../types/auth';
+import type { MovieResponseDTO, SessionResponseDTO, RoomResponseDTO, SeatDTO } from '../../types/auth';
 import { motion } from 'framer-motion';
 import Stepper, { Step } from '../../components/UI/Stepper';
 import { AuroraBackground } from '../../components/Layout/AuroraBackground';
@@ -10,10 +10,12 @@ import AppNavbar from '../../components/Layout/Navbar';
 import AppFooter from '../../components/Layout/Footer';
 import NotFoundPage from '../shared/NotFoundPage';
 import { PaymentStatusModal, type PaymentStatus } from './components/PaymentStatusModal';
+import { fetchSessionsByMovieId, fetchRoomById, fetchSeatsByRoomId } from '../../client/publicApi';
 
 interface BookingData {
   movieId: string;
   seats: string[];
+  sessionId?: number;
   showTime?: string;
   showDate?: string;
   customerName: string;
@@ -60,6 +62,19 @@ export default function BookingPage() {
   );
   const [isLoading, setIsLoading] = useState(!(location.state?.movie));
   const initialSeats: string[] = location.state?.seats?.map((s: number | string) => s.toString()) || [];
+  
+  // API Data States
+  const [sessions, setSessions] = useState<SessionResponseDTO[]>([]);
+  const [room, setRoom] = useState<RoomResponseDTO | null>(null);
+  const [seats, setSeats] = useState<SeatDTO[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [seatsLoading, setSeatsLoading] = useState(false);
+  
+  // Pricing mapping based on seat type
+  const seatTypePricing: Record<'STANDARD' | 'PREMIUM', number> = {
+    STANDARD: 250,
+    PREMIUM: 300,
+  };
 
   // Fetch movie on mount only if not already provided through state
   useEffect(() => {
@@ -74,11 +89,31 @@ export default function BookingPage() {
     }
   }, [id, fetchMovieById, movie]);
 
+  // Fetch sessions when movie is loaded
+  useEffect(() => {
+    if (movie?.id) {
+      setSessionsLoading(true);
+      const loadSessions = async () => {
+        try {
+          const sessionData = await fetchSessionsByMovieId(movie.id);
+          setSessions(sessionData);
+          console.log(`✅ Loaded ${sessionData.length} sessions for movie ${movie.id}`);
+        } catch (error) {
+          console.error('❌ Failed to load sessions:', error);
+        } finally {
+          setSessionsLoading(false);
+        }
+      };
+      loadSessions();
+    }
+  }, [movie?.id]);
+
   const [bookingData, setBookingData] = useState<BookingData>({
     movieId: id || '',
     seats: initialSeats,
-    showTime: '7:00 PM',
-    showDate: new Date().toISOString().split('T')[0],
+    sessionId: undefined,
+    showTime: undefined,
+    showDate: undefined,
     customerName: '',
     email: '',
     phone: '',
@@ -92,8 +127,63 @@ export default function BookingPage() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Define premium seats (e.g., middle rows, center columns)
-  const premiumSeats = ['C4', 'C5', 'D4', 'D5'];
+  // Fetch room and seats when session is selected
+  useEffect(() => {
+    if (bookingData.sessionId) {
+      setSeatsLoading(true);
+      const loadRoomAndSeats = async () => {
+        try {
+          // Find the selected session to get its room ID
+          const selectedSession = sessions.find(s => s.id === bookingData.sessionId);
+          if (!selectedSession) {
+            console.error('❌ Selected session not found');
+            return;
+          }
+
+          const roomData = await fetchRoomById(selectedSession.roomId);
+          setRoom(roomData);
+          
+          const seatsData = await fetchSeatsByRoomId(selectedSession.roomId);
+          setSeats(seatsData);
+          console.log(`✅ Loaded room "${roomData?.roomName}" (${selectedSession.roomName}) with ${seatsData.length} seats`);
+        } catch (error) {
+          console.error('❌ Failed to load room and seats:', error);
+        } finally {
+          setSeatsLoading(false);
+        }
+      };
+      loadRoomAndSeats();
+    }
+  }, [bookingData.sessionId, sessions]);
+
+  // Helper: Get unique dates from sessions
+  const getUniqueDatesFromSessions = (): string[] => {
+    const dates = new Set(
+      sessions.map(s => new Date(s.startTime).toISOString().split('T')[0])
+    );
+    return Array.from(dates).sort();
+  };
+
+  // Helper: Get sessions for selected date
+  const getSessionsForDate = (date: string): SessionResponseDTO[] => {
+    return sessions.filter(
+      s => new Date(s.startTime).toISOString().split('T')[0] === date
+    );
+  };
+
+  // Helper: Get seat price by seat code
+  const getSeatPrice = (seatCode: string): number => {
+    const seat = seats.find(s => s.seatCode === seatCode);
+    if (!seat) return 250; // Default to standard price
+    return seat.seatType === 'PREMIUM' ? seatTypePricing.PREMIUM : seatTypePricing.STANDARD;
+  };
+
+  // Helper: Calculate total booking amount
+  const calculateTotalAmount = (): number => {
+    return bookingData.seats.reduce((total, seatCode) => {
+      return total + getSeatPrice(seatCode);
+    }, 0);
+  };
 
   // Compute step validations
   const isStep1Valid = validateStep1(bookingData.showTime, bookingData.showDate);
@@ -104,8 +194,15 @@ export default function BookingPage() {
   const handleInputChange = (field: string, value: string) => {
     setBookingData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
+      // Reset sessionId if changing date or time
+      ...(field === 'showDate' && { sessionId: undefined, seats: [] })
     }));
+    // Clear room/seats if resetting session
+    if (field === 'showDate') {
+      setRoom(null);
+      setSeats([]);
+    }
   };
 
   const handleStepChange = useCallback((step: number) => {
@@ -114,7 +211,7 @@ export default function BookingPage() {
 
   const handleFinalStepCompleted = async () => {
     setLoading(true);
-    const amount = bookingData.seats.reduce((total, seat) => total + (premiumSeats.includes(seat) ? 300 : 250), 0);
+    const amount = calculateTotalAmount();
     const txId = 'TXN-' + Math.random().toString(36).substring(7).toUpperCase();
     
     setTransactionId(txId);
@@ -257,27 +354,36 @@ export default function BookingPage() {
                     <span className="text-red-400 text-sm font-medium font-body">Required</span>
                   )}
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
-                  {[0, 1, 2, 3, 4, 5, 6].map(day => {
-                    const date = new Date(Date.now() + day * 24 * 60 * 60 * 1000);
-                    const dateStr = date.toISOString().split('T')[0];
-                    const isSelected = bookingData.showDate === dateStr;
-                    return (
-                      <button
-                        key={day}
-                        onClick={() => handleInputChange('showDate', dateStr)}
-                        className={`cursor-target p-3 rounded-lg font-semibold transition-all ${
-                          isSelected
-                            ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg'
-                            : 'bg-slate-800 text-slate-100 hover:bg-slate-700'
-                        }`}
-                      >
-                        <div className="text-sm font-body">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                        <div className="text-lg font-body">{date.getDate()}</div>
-                      </button>
-                    );
-                  })}
-                </div>
+                {sessionsLoading ? (
+                  <div className="text-slate-400 font-semibold py-4">Loading available dates...</div>
+                ) : getUniqueDatesFromSessions().length === 0 ? (
+                  <div className="text-red-400 font-semibold py-4">No sessions available for this movie</div>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
+                    {getUniqueDatesFromSessions().map(dateStr => {
+                      const date = new Date(dateStr + 'T00:00:00');
+                      const isSelected = bookingData.showDate === dateStr;
+                      return (
+                        <button
+                          key={dateStr}
+                          onClick={() => {
+                            handleInputChange('showDate', dateStr);
+                            // Reset time selection when changing date
+                            handleInputChange('showTime', '');
+                          }}
+                          className={`cursor-target p-3 rounded-lg font-semibold transition-all ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg'
+                              : 'bg-slate-800 text-slate-100 hover:bg-slate-700'
+                          }`}
+                        >
+                          <div className="text-sm font-body">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                          <div className="text-lg font-body">{date.getDate()}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Time Selection */}
@@ -288,21 +394,41 @@ export default function BookingPage() {
                     <span className="text-red-400 text-sm font-medium font-body">Required</span>
                   )}
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-                  {['9:00 AM', '12:00 PM', '3:00 PM', '6:00 PM', '7:00 PM', '10:00 PM'].map(time => (
-                    <button
-                      key={time}
-                      onClick={() => handleInputChange('showTime', time)}
-                      className={`cursor-target p-3 rounded-lg font-semibold transition-all ${
-                        bookingData.showTime === time
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg'
-                          : 'bg-slate-800 text-slate-100 hover:bg-slate-700'
-                      }`}
-                    >
-                      {time}
-                    </button>
-                  ))}
-                </div>
+                {!bookingData.showDate ? (
+                  <div className="text-slate-400 font-semibold py-4">Please select a date first</div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                    {getSessionsForDate(bookingData.showDate).map(session => {
+                      const startTime = new Date(session.startTime).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      });
+                      const isSelected = bookingData.sessionId === session.id;
+                      return (
+                        <button
+                          key={session.id}
+                          onClick={() => {
+                            handleInputChange('showTime', startTime);
+                            setBookingData(prev => ({
+                              ...prev,
+                              sessionId: session.id,
+                              seats: [] // Clear previously selected seats when switching sessions
+                            }));
+                          }}
+                          className={`cursor-target p-3 rounded-lg font-semibold transition-all ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg'
+                              : 'bg-slate-800 text-slate-100 hover:bg-slate-700'
+                          }`}
+                          title={`Room: ${session.roomName}`}
+                        >
+                          {startTime}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {!isStep1Valid && (
@@ -348,59 +474,80 @@ export default function BookingPage() {
                       <div className="w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mt-4 rounded-full"></div>
                     </div>
 
-                    {/* Simulated Seat Grid */}
-                    <div className="space-y-3 max-w-2xl mx-auto">
-                      {['A', 'B', 'C', 'D', 'E'].map(row => (
-                        <div key={row} className="flex justify-center gap-2">
-                          <span className="w-8 flex items-center justify-center text-white text-sm font-bold drop-shadow-md font-body">{row}</span>
-                          <div className="flex gap-2">
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(col => {
-                              const seatNum = `${row}${col}`;
-                              const isSelected = bookingData.seats.includes(seatNum);
-                              const isPremium = premiumSeats.includes(seatNum);
-                              return (
-                                <button
-                                  key={seatNum}
-                                  onClick={() => {
-                                    setBookingData(prev => ({
-                                      ...prev,
-                                      seats: isSelected
-                                        ? prev.seats.filter(s => s !== seatNum)
-                                        : [...prev.seats, seatNum]
-                                    }));
-                                  }}
-                                  className={`cursor-target w-8 h-8 rounded flex items-center justify-center text-xs font-bold transition-all cursor-pointer ${
-                                    isSelected
-                                      ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg scale-110'
-                                      : isPremium
-                                      ? 'bg-yellow-600/60 text-yellow-200 hover:bg-yellow-600 border border-yellow-500/50'
-                                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                                  }`}
-                                  title={isPremium ? 'Premium Seat' : 'Standard Seat'}
-                                >
-                                  {isSelected ? '✓' : ''}
-                                </button>
-                              );
-                            })}
+                    {/* Dynamic Seat Grid */}
+                    {seatsLoading ? (
+                      <div className="text-center text-slate-400 py-8">Loading seats...</div>
+                    ) : seats.length === 0 ? (
+                      <div className="text-center text-red-400 py-8">No seats available</div>
+                    ) : (
+                      <>
+                        <div className="space-y-3 max-w-4xl mx-auto">
+                          {room && Array.from({ length: room.rowSize }, (_, rowIdx) => {
+                            const rowLetter = String.fromCharCode(65 + rowIdx); // A, B, C, etc.
+                            const rowSeats = seats.filter(s => s.seatRow === rowLetter);
+                            return (
+                              <div key={rowLetter} className="flex justify-center gap-2">
+                                <span className="w-8 flex items-center justify-center text-white text-sm font-bold drop-shadow-md font-body">{rowLetter}</span>
+                                <div className="flex gap-2">
+                                  {rowSeats.sort((a, b) => a.seatNumber - b.seatNumber).map(seat => {
+                                    const isSelected = bookingData.seats.includes(seat.seatCode);
+                                    const isAvailable = seat.empty;
+                                    const isPremium = seat.seatType === 'PREMIUM';
+                                    
+                                    return (
+                                      <button
+                                        key={seat.id}
+                                        onClick={() => {
+                                          if (isAvailable) {
+                                            setBookingData(prev => ({
+                                              ...prev,
+                                              seats: isSelected
+                                                ? prev.seats.filter(s => s !== seat.seatCode)
+                                                : [...prev.seats, seat.seatCode]
+                                            }));
+                                          }
+                                        }}
+                                        disabled={!isAvailable}
+                                        className={`cursor-target w-8 h-8 rounded flex items-center justify-center text-xs font-bold transition-all ${
+                                          !isAvailable
+                                            ? 'bg-red-900/50 text-red-300 cursor-not-allowed opacity-50'
+                                            : isSelected
+                                            ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg scale-110'
+                                            : isPremium
+                                            ? 'bg-yellow-600/60 text-yellow-200 hover:bg-yellow-600 border border-yellow-500/50'
+                                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600 cursor-pointer'
+                                        }`}
+                                        title={`${seat.seatCode} - ${seat.seatType} (${isAvailable ? 'Available' : 'Occupied'})`}
+                                      >
+                                        {isSelected ? '✓' : ''}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex justify-center gap-6 mt-8 flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-slate-700 rounded"></div>
+                            <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Available</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-yellow-600/60 rounded border border-yellow-500/50"></div>
+                            <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Premium (₹{seatTypePricing.PREMIUM})</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-gradient-to-r from-purple-600 to-pink-500 rounded"></div>
+                            <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Selected</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-red-900/50 rounded"></div>
+                            <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Occupied</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-
-                    <div className="flex justify-center gap-6 mt-8 flex-wrap">
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-slate-700 rounded"></div>
-                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Available</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-yellow-600/60 rounded border border-yellow-500/50"></div>
-                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Premium (₹300)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-gradient-to-r from-purple-600 to-pink-500 rounded"></div>
-                        <span className="text-slate-100 text-sm font-semibold drop-shadow-md font-label">Selected</span>
-                      </div>
-                    </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -408,25 +555,32 @@ export default function BookingPage() {
                 <div className="space-y-4">
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
                     <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Show Time</p>
-                    <p className="text-white font-bold text-lg mt-1 font-body">{bookingData.showTime}</p>
+                    <p className="text-white font-bold text-lg mt-1 font-body">{bookingData.showTime || 'Not selected'}</p>
                   </div>
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
                     <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Selected Seats</p>
                     <p className="text-white font-bold text-lg mt-1 font-body">{bookingData.seats.length} Seat{bookingData.seats.length !== 1 ? 's' : ''}</p>
+                    {bookingData.seats.length > 0 && (
+                      <p className="text-slate-300 text-xs mt-2">{bookingData.seats.join(', ')}</p>
+                    )}
                   </div>
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
                     <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Standard Seats</p>
-                    <p className="text-white font-bold text-lg mt-1 font-body">{bookingData.seats.filter(s => !premiumSeats.includes(s)).length} × ₹250</p>
+                    <p className="text-white font-bold text-lg mt-1 font-body">
+                      {bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.STANDARD).length} × ₹{seatTypePricing.STANDARD}
+                    </p>
                   </div>
                   <div className="bg-slate-800/60 border border-white/20 rounded-lg p-4">
                     <p className="text-slate-100 text-xs font-semibold drop-shadow-md uppercase tracking-wide font-label">Premium Seats</p>
-                    <p className="text-yellow-300 font-bold text-lg mt-1 font-body">{bookingData.seats.filter(s => premiumSeats.includes(s)).length} × ₹300</p>
+                    <p className="text-yellow-300 font-bold text-lg mt-1 font-body">
+                      {bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.PREMIUM).length} × ₹{seatTypePricing.PREMIUM}
+                    </p>
                   </div>
                   <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/50 rounded-lg p-4 sticky top-4">
                     <div className="flex flex-col gap-2">
                       <span className="text-slate-100 font-semibold drop-shadow-md">Total Price</span>
                       <p className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 font-bold text-3xl drop-shadow-lg">
-                        ₹{bookingData.seats.reduce((total, seat) => total + (premiumSeats.includes(seat) ? 300 : 250), 0)}
+                        ₹{calculateTotalAmount()}
                       </p>
                     </div>
                   </div>
@@ -644,22 +798,22 @@ export default function BookingPage() {
                   <div className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/50 rounded-xl p-6 sticky top-4">
                     <h3 className="text-white font-title font-bold mb-4 text-lg drop-shadow-md">Order Summary</h3>
                     <div className="space-y-3">
-                      {bookingData.seats.filter(s => !premiumSeats.includes(s)).length > 0 && (
+                      {bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.STANDARD).length > 0 && (
                         <div className="flex justify-between text-white font-semibold drop-shadow-md">
-                          <span className="text-slate-100">{bookingData.seats.filter(s => !premiumSeats.includes(s)).length} Standard Seats × ₹250</span>
-                          <span className="text-white">₹{bookingData.seats.filter(s => !premiumSeats.includes(s)).length * 250}</span>
+                          <span className="text-slate-100">{bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.STANDARD).length} Standard Seats × ₹{seatTypePricing.STANDARD}</span>
+                          <span className="text-white">₹{bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.STANDARD).length * seatTypePricing.STANDARD}</span>
                         </div>
                       )}
-                      {bookingData.seats.filter(s => premiumSeats.includes(s)).length > 0 && (
+                      {bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.PREMIUM).length > 0 && (
                         <div className="flex justify-between text-yellow-100 font-semibold drop-shadow-md">
-                          <span className="text-yellow-200">{bookingData.seats.filter(s => premiumSeats.includes(s)).length} Premium Seats × ₹300</span>
-                          <span className="text-yellow-100">₹{bookingData.seats.filter(s => premiumSeats.includes(s)).length * 300}</span>
+                          <span className="text-yellow-200">{bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.PREMIUM).length} Premium Seats × ₹{seatTypePricing.PREMIUM}</span>
+                          <span className="text-yellow-100">₹{bookingData.seats.filter(s => getSeatPrice(s) === seatTypePricing.PREMIUM).length * seatTypePricing.PREMIUM}</span>
                         </div>
                       )}
                       <div className="border-t border-white/20 pt-3 flex justify-between">
                         <span className="text-white font-bold drop-shadow-md">Total Amount</span>
                         <span className="text-white font-bold text-xl drop-shadow-lg">
-                          ₹{bookingData.seats.reduce((total, seat) => total + (premiumSeats.includes(seat) ? 300 : 250), 0)}
+                          ₹{calculateTotalAmount()}
                         </span>
                       </div>
                     </div>

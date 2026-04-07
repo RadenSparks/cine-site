@@ -163,3 +163,44 @@ export type PaginatedResponse<T> = {
   last: boolean;
   first: boolean;
 };
+
+/**
+ * Seat DTO - Matches backend Seat entity
+ */
+export type SeatDTO = {
+  id: number;
+  seatCode: string;
+  seatRow: string;
+  seatNumber: number;
+  seatType: 'STANDARD' | 'PREMIUM';
+  empty: boolean;
+};
+
+/**
+ * Room Response DTO - Matches backend RoomResponseDTO
+ */
+export type RoomResponseDTO = {
+  id: number;
+  roomName: string;
+  rowSize: number;
+  columnSize: number;
+  seats: SeatDTO[];
+  capacity: number;
+  deleted: boolean;
+};
+
+/**
+ * Session Response DTO - Matches backend SessionResponseDTO
+ */
+export type SessionResponseDTO = {
+  id: number;
+  movieId: number;
+  movieTitle: string;
+  movieDuration: number;
+  roomId: number;
+  roomName: string;
+  startTime: string; // ISO DateTime string
+  endTime: string; // ISO DateTime string
+  basePrice: number;
+  deleted: boolean;
+};
